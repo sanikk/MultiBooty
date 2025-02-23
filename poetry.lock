@@ -12,6 +12,17 @@ files = [
 ]
 
 [[package]]
+name = "pycdlib"
+version = "1.14.0"
+description = "Pure python ISO manipulation library"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pycdlib-1.14.0-py2.py3-none-any.whl", hash = "sha256:a905827335f0066af3fd416c5cf9b1f29dffaf4d0914b714555213d1809f38d4"},
+    {file = "pycdlib-1.14.0.tar.gz", hash = "sha256:8ec306b31d9c850f28c5fda52438d904edd1e8fcf862c5ffd756272efac9f422"},
+]
+
+[[package]]
 name = "pyside6"
 version = "6.8.2.1"
 description = "Python bindings for the Qt cross-platform application and UI framework"
@@ -63,6 +74,17 @@ files = [
 shiboken6 = "6.8.2.1"
 
 [[package]]
+name = "pysquashfsimage"
+version = "0.9.0"
+description = "Squashfs image parser"
+optional = false
+python-versions = ">=2.7, !=3.0.*"
+files = [
+    {file = "PySquashfsImage-0.9.0-py2.py3-none-any.whl", hash = "sha256:a8ea154bf946f985c65fab7d8c08dc73da7ad47a0aebf0d13ae50ae56e369f90"},
+    {file = "PySquashfsImage-0.9.0.tar.gz", hash = "sha256:d3330ccd111ac2ef2cebf0c392077fe8608e2760862531d960ec9cb6c6d3655f"},
+]
+
+[[package]]
 name = "pyudev"
 version = "0.24.3"
 description = "A libudev binding"
@@ -89,4 +111,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.13,<3.14"
-content-hash = "55e1f18514509fbd49b726841d361d7f7c154441251eda28dc69a76e400acf72"
+content-hash = "f894e5efecf464bc1429402ea2b3766e801d7fa0d096fa0c39c8d3ad261b30a1"

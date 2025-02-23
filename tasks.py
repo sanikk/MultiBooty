@@ -21,3 +21,8 @@ def blockdevices(_):
 @task
 def diskinfo(_):
     print(get_disk_info(["/dev/sdc", "/dev/sdb"]))
+
+
+@task
+def iso(c):
+    c.run("python3 iso_tools/arch_iso.py", pty=True)

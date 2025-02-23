@@ -11,6 +11,8 @@ python = ">=3.13,<3.14"
 invoke = "^2.2.0"
 pyside6 = "^6.8.2.1"
 pyudev = "^0.24.3"
+pycdlib = "^1.14.0"
+pysquashfsimage = "^0.9.0"
 
 
 [build-system]
