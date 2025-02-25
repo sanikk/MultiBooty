@@ -1,16 +1,9 @@
+from package_management.debian.parse_debian_packages_file import (
+    parse_debian_packages_file,
+)
 import pycdlib
 from pathlib import Path
 import gzip
-from email.parser import Parser
-
-
-def parse_packages_file(packages_text):
-    packages = packages_text.strip().split("\n\n")
-    parsed_packages = {}
-    for package in packages:
-        msg = Parser().parsestr(package)
-        parsed_packages[msg["Package"]] = {k: v for k, v in msg.items()}
-    return parsed_packages
 
 
 def list_packages_from_debian_iso(iso_path):
@@ -36,7 +29,7 @@ def list_packages_from_debian_iso(iso_path):
                     with iso.open_file_from_iso(iso_path=packages_path.__str__()) as f:
                         with gzip.open(f, "rt", encoding="utf-8") as gf:
                             component = packages_path.parts[-3]
-                            iso_info[component] = parse_packages_file(gf.read())  # type: ignore
+                            iso_info[component] = parse_debian_packages_file(gf.read())  # type: ignore
     iso.close()
     return iso_info
 
