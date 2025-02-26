@@ -1,5 +1,28 @@
 I'm trying to make this thing. We'll see how this goes.
 
+## Configuration:
+I don't want to parse HTML pages for lists of mirrors, because KISS.
+
+So there are a few directories under the directory
+package_lists
+Just paste the host part of a mirror near you to
+
+Debian
+[List of mirrors](https://www.debian.org/mirror/list)
+Where to paste: package_lists/debian/source.txt
+Example: ftp.fi.debian.org
+
+Arch
+[List of mirrors](https://archlinux.org/mirrors/status/)
+Where to paste: package_lists/arch/source.txt
+Example: mirror.hosthink.net/archlinux
+
+### TODO NOTICE
+
+Ok using those mirror config files has NOT been implemented yet. For now you can just check out individual functions,
+and edit the urls you want in by hand in the if __name__==... parts.
+We'll get there when I have stuff tying these functions together, and paths from root are nicer to build.
+
 Legalese:
 
 ## License
