@@ -13,6 +13,7 @@ pyside6 = "^6.8.2.1"
 pyudev = "^0.24.3"
 pycdlib = "^1.14.0"
 pysquashfsimage = "^0.9.0"
+pyparted = "^3.13.0"
 
 
 [build-system]
