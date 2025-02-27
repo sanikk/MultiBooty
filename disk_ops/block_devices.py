@@ -2,6 +2,15 @@ import pyudev
 
 
 def get_all_block_devices() -> list[str]:
+    """
+    Get all connected USB block devices.
+
+    Returns:
+        Returns a list of /dev/sdX devices.
+
+    Example:
+        returns ["/dev/sdc"]
+    """
     context = pyudev.Context()
     usb_devices = [
         device.device_node
