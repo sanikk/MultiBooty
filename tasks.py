@@ -14,6 +14,11 @@ def gui(c):
 
 
 @task
+def curses(c):
+    c.run("python3 curses_ui.py", pty=True)
+
+
+@task
 def blockdevices(_):
     print(get_all_block_devices())
 
