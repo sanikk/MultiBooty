@@ -5,6 +5,26 @@ from urllib.error import HTTPError
 def download_with_progress(
     url, dest_path, progress_callback=None, stored_last_modified=None
 ):
+    """
+    Downloads a Packages.gz file from the url provided.
+    Displays progress if progress callback is provided.
+    Checks if the local file is already the newest one.
+
+
+        Args:
+            url (str|Path): where to fetch the file from
+            dest_path (str|Path): where to write the file to. Path and filename.
+            progress_callback (function): what function to use for reporting progress
+            stored_last_modifier (timestamp): timestamp of old file to compare to
+
+
+        Returns:
+            return_type: Description of the return value.
+
+        Example:
+            example stored_last_modified: "Sat, 11 Jan 2025 09:46:33 GMT"
+
+    """
     req = urllib.request.Request(url)
     if stored_last_modified:
         req.add_header("If-Modified-Since", stored_last_modified)
@@ -30,6 +50,15 @@ def download_with_progress(
 
 
 def print_progress(downloaded, total):
+    """
+    Progress callback function for text UI.
+
+    Args:
+        downloaded (int): how much has been downloaded, in bytes
+        total (int): total expected size of the file
+
+
+    """
     if total > 0:
         percent = (downloaded / total) * 100
         print(f"Downloaded: {downloaded}/{total} bytes ({percent:.2f}%)", end="\r")
