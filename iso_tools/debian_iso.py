@@ -7,6 +7,15 @@ import gzip
 
 
 def list_packages_from_debian_iso(iso_path):
+    """
+    Rips the Packages files from a debian installation ISO.
+
+    Args:
+        iso_path (str|Path): path and filename of the ISO.
+
+    Returns:
+        dict of information on the ISO, including the Packages
+    """
     iso_info = {"name": Path(iso_path).stem}
     (
         iso_info["distro"],

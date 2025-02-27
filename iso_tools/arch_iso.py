@@ -3,8 +3,16 @@ from PySquashfsImage import SquashFsImage
 
 
 def list_packages_from_arch_iso(iso_path):
-    # with pycdlib.PyCdlib() as iso:
-    iso = pycdlib.PyCdlib()
+    """
+    Rips a list of packages from an Arch Linux installation ISO.
+
+    Args:
+        iso_path (str|Path): path to the ISO file.
+
+    Returns:
+        list of package names found on the ISO.
+    """
+    iso = pycdlib.pycdlib.PyCdlib()
     iso.open(iso_path)
 
     sfs_path = None
@@ -23,8 +31,9 @@ def list_packages_from_arch_iso(iso_path):
     iso.close()
     with SquashFsImage.from_bytes(bytes(sfs_data)) as sfs_image:
         pacman_local_dir = sfs_image.select("/var/lib/pacman/local")
-        packages = [entry.name for entry in pacman_local_dir.iterdir() if entry.is_dir]
-    return packages
+        if pacman_local_dir:
+            return [entry.name for entry in pacman_local_dir.iterdir() if entry.is_dir]
+    return None
 
 
 if __name__ == "__main__":
