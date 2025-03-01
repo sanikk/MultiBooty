@@ -1,5 +1,4 @@
 import subprocess, json
-from sys import stdout
 
 
 def translate_partition_type(code):
