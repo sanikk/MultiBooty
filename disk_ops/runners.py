@@ -1,4 +1,6 @@
-import subprocess, sys
+import subprocess, sys, json
+
+from parted import IOException
 
 
 vpython = ""
@@ -22,5 +24,20 @@ def run_subprocess_with_sudo(command, arguments: list, error_type, error_message
             text=True,
         )
     except error_type:
-        print(error_message)
+        print(f"{error_type}: {error_message}", file=sys.stderr)
         return None
+
+
+def propose_partitions(dev: str, size_in_mb: int):
+    ret = run_subprocess_with_sudo(
+        "disk_ops/proposed_partitioning.py",
+        [dev, str(size_in_mb)],
+        IOException,
+        f"Invalid device node {dev}.",
+    )
+    if ret:
+        if ret.returncode == 0:
+            device_infos = json.loads(ret.stdout)
+            return device_infos
+        return {"error": ret.stderr}
+    return {"error": "No return value"}
