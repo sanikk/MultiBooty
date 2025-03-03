@@ -2,6 +2,12 @@ from invoke.tasks import task
 from disk_ops.disk_info import get_disk_info
 from disk_ops.block_devices import get_all_block_devices
 
+from disk_ops.runners import (
+    run_python_subprocess_with_sudo,
+    propose_partitions,
+    make_partitions,
+)
+
 
 @task
 def start(_):
@@ -31,3 +37,10 @@ def diskinfo(_):
 @task
 def iso(c):
     c.run("python3 iso_tools/arch_iso.py", pty=True)
+
+
+# 0         EFI System Partition               2048        208895      100.00      fat32          Y
+# 1         Root Partition                     208896      30865408    14969.00    ext4
+@task
+def parttest(_):
+    print(make_partitions("/dev/sdc", 2048, 208895, 208896, 30865408))
