@@ -31,10 +31,14 @@ def propose_partitions(dev: str, boot_size_mb: int) -> dict:
 
     boot_size_sectors = (boot_size_mb * 1024 * 1024) // logical_sector_size
     boot_start = aligned_up
-    boot_end = alignment.alignDown(geom, boot_start + boot_size_sectors)
+    boot_end = alignment.alignDown(geom, boot_start + boot_size_sectors) - 1
 
     root_start = boot_end + 1
-    root_end = alignment.alignDown(geom, total_sectors - 1)
+    root_end = (
+        total_sectors
+        if (total_sectors + 1) % alignment.grainSize == 0
+        else alignment.alignDown(geom, total_sectors)
+    )
 
     partition_info = {
         "device": dev,
