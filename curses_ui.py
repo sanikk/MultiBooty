@@ -3,8 +3,7 @@ from disk_ops.disks.block_devices import get_all_block_devices
 from disk_ops.disks.disk_info import get_disk_info
 from disk_ops.disks.gather_block_info import gather_block_info
 
-# from disk_ops.proposed_partitioning import propose_partitions
-from disk_ops.runners import (
+from disk_ops.partitions.partition_runners import (
     propose_partitions,
     make_partitions,
 )
