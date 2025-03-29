@@ -26,6 +26,16 @@ def translate_partition_type(code):
 
 
 def gather_block_info(dev):
+    """
+    USERSPACE
+    Gathers info about a single block device.
+
+    Args:
+        dev (str): Block device to inspect.
+
+    Returns:
+        dict: The lsblk output for the device or an empty dict.
+    """
     ret = subprocess.run(
         [
             "lsblk",

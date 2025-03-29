@@ -13,7 +13,24 @@ def partition_disk(
     root_end,
     # pttype="gpt", optimum=True
 ):
-    # Open the device
+    # TODO: add possible error types to docstring here
+    """
+    SUDO
+    Partitions the disk
+
+    Args:
+        dev (str): The device_node to partition ("/dev/sdX")
+        boot_start (int): The start sector of boot partition
+        boot_end (int): The end sector of boot partition
+        root_start (int): The start sector of root partition
+        root_end (int): The end sector of root partition
+    Sketched args:
+        pttype (str): The partition table type, "gpt" or "mbr"
+        optimum (bool): Whether to use optimum values for sectors considering block size
+
+    Returns:
+        None: might throw an error
+    """
     device = parted.Device(dev)
     disk = parted.freshDisk(device, "gpt")
 
@@ -44,7 +61,7 @@ def partition_disk(
     disk.addPartition(
         root_partition, parted.Constraint(exactGeom=root_partition.geometry)
     )
-    # Commit changes to disk
+
     disk.commit()
 
 

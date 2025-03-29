@@ -3,6 +3,7 @@ import pyudev
 
 def get_all_block_devices() -> list[str]:
     """
+    USERSPACE
     Get all connected USB block devices.
 
     Returns:
