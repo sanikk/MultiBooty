@@ -1,7 +1,7 @@
 from typing import no_type_check
-from disk_ops.block_devices import get_all_block_devices
-from disk_ops.disk_info import get_disk_info
-from disk_ops.gather_block_info import gather_block_info
+from disk_ops.disks.block_devices import get_all_block_devices
+from disk_ops.disks.disk_info import get_disk_info
+from disk_ops.disks.gather_block_info import gather_block_info
 
 # from disk_ops.proposed_partitioning import propose_partitions
 from disk_ops.runners import (
