@@ -20,4 +20,6 @@ def get_disk_info(devs: list[str]) -> dict:
             print("Error: no return value from gathering device info")
         else:
             print("Error:", ret.stderr)
+            if not ret.stderr:
+                print("No devices found")
         return {}
