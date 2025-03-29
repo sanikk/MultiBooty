@@ -1,9 +1,11 @@
 from invoke.tasks import task
-from disk_ops.disk_info import get_disk_info
-from disk_ops.block_devices import get_all_block_devices
+from disk_ops.disks.disk_runners import get_disk_info
+from disk_ops.disks.block_devices import get_all_block_devices
 
 from disk_ops.runners import (
     run_python_subprocess_with_sudo,
+)
+from disk_ops.partitions.partition_runners import (
     propose_partitions,
     make_partitions,
 )
