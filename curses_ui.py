@@ -7,6 +7,8 @@ from disk_ops.gather_block_info import gather_block_info
 from disk_ops.runners import (
     propose_partitions,
     make_partitions,
+)
+from disk_ops.make_filesystems import (
     make_boot_filesystem,
     make_ext_filesystem,
 )
