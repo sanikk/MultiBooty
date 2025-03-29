@@ -5,9 +5,9 @@ import json
 
 def propose_partitions(dev: str, boot_size_mb: int) -> dict:
     """
+    SUDO
     Partitions the dev with desired boot sector size.
     Does NOT commit changes to disk, just returns the values.
-    Needs sudo to run on most systems.
 
     Args
         dev (str): device to run on

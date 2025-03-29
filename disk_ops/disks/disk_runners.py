@@ -10,7 +10,7 @@ def get_disk_info(devs: list[str]) -> dict:
     print(f"from devices: {devs}.")
     print("This is a read-only op.")
     ret = run_python_subprocess_with_sudo(
-        "disk_ops/disk_info_linux.py", devs, FileNotFoundError, "No such device."
+        "disk_ops/disks/disk_info_linux.py", devs, FileNotFoundError, "No such device."
     )
     if ret and ret.returncode == 0:
         device_infos = json.loads(ret.stdout)

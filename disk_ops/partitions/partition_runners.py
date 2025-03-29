@@ -5,7 +5,7 @@ from parted import IOException
 
 def propose_partitions(dev: str, size_in_mb: int):
     ret = run_python_subprocess_with_sudo(
-        "disk_ops/propose_partitions.py",
+        "disk_ops/partitions/propose_partitions.py",
         [dev, str(size_in_mb)],
         IOException,
         f"Invalid device node {dev}.",
@@ -27,7 +27,7 @@ def make_partitions(
     # table_type="gpt", optimum=True
 ):
     ret = run_python_subprocess_with_sudo(
-        "disk_ops/partition_disk.py",
+        "disk_ops/partitions/partition_disk.py",
         [
             dev,
             str(boot_start),

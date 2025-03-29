@@ -64,7 +64,3 @@ def gather_block_info(dev):
     else:
         print("Error:", ret.stderr)
     return {}
-
-
-if __name__ == "__main__":
-    print(gather_block_info("/dev/sdc"))
