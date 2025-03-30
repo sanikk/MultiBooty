@@ -14,25 +14,38 @@ if not vpython:
     sys.exit(1)
 
 
-def run_python_subprocess_with_sudo(
-    command, arguments: list, error_type, error_message: str
-):
-    try:
-        return subprocess.run(
-            ["sudo", vpython, command, *arguments],
-            capture_output=True,
-            text=True,
-        )
-    except error_type:
-        print(f"{error_type}: {error_message}", file=sys.stderr)
-        return None
+def run_python_subprocess_with_sudo(command, arguments: list):
+    """
+    Run a python script in a subprocess with elevated priviledges.
+    Should use the python of possible virtual env.
+
+    Args:
+        command (str): the actual command to run, "ls"
+        arguments (list[str]): list of arguments for the command
+
+    Returns:
+        subprocess return value
+    """
+    # TODO: add check to see if we even need sudo
+    return subprocess.run(
+        ["sudo", vpython, command, *arguments],
+        capture_output=True,
+        text=True,
+    )
 
 
-def run_subprocess_with_sudo(command, arguments: list, error_type, error_message: str):
-    try:
-        return subprocess.run(
-            ["sudo", command, *arguments], capture_output=True, text=True, check=True
-        )
-    except error_type:
-        print(f"{error_type}: {error_message}", file=sys.stderr)
-        return None
+def run_subprocess_with_sudo(command, arguments: list):
+    """
+    Run a program in a subprocess with elevated priviledges.
+
+    Args:
+        command (str): the actual command to run, "ls"
+        arguments (list[str]): list of arguments for the command
+
+    Returns:
+        subprocess return value
+    """
+    # TODO: add check to see if we even need sudo
+    return subprocess.run(
+        ["sudo", command, *arguments], capture_output=True, text=True, check=True
+    )
