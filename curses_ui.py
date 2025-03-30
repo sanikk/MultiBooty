@@ -11,20 +11,64 @@ from disk_ops.make_filesystems import (
     make_boot_filesystem,
     make_ext_filesystem,
 )
+from grub.grub_runners import make_grub
 import sys
 import curses
 
 
 def partition_disk(stdscr, dev, boot_start, boot_end, root_start, root_end):
-    stdscr.addstr(f"Partitioning {dev}...")
+    stdscr.clear()
+    stdscr.addstr(f"Partitioning {dev}...\n")
     make_partitions(dev, boot_start, boot_end, root_start, root_end)
-    stdscr.addstr(f"Making fat32 filesystem for {dev} boot partition.")
+    stdscr.addstr(f"Making fat32 filesystem for {dev} boot partition.\n")
     make_boot_filesystem(dev, 1)
-    stdscr.addstr(f"Making ext4 filesystem for {dev} root partition.")
+    stdscr.addstr(f"Making ext4 filesystem for {dev} root partition.\n")
     make_ext_filesystem(dev, 2)
-    stdscr.addstr(f"Boot partition: {boot_start=}, {boot_end=}")
-    stdscr.addstr(f"Root partition: {root_start=}, {root_end=}")
+    stdscr.addstr(f"Goals:\n")
+    stdscr.addstr(f"Boot partition: {boot_start=}, {boot_end=}\n")
+    stdscr.addstr(f"Root partition: {root_start=}, {root_end=}\n")
     stdscr.addstr("Press any key to continue...")
+    stdscr.getch()
+    return show_current_partitions_screen, dev, False
+
+
+def grub_screen(stdscr, dev):
+    stdscr.clear()
+
+    mountpoint = "/mnt"
+    arch = True
+    legacy = True
+
+    stdscr.addstr("Install grub\n\n")
+
+    stdscr.addstr(f"Enter mountpoint [{mountpoint}]: ")
+    stdscr.refresh()
+    curses.echo()
+    user_input = stdscr.getstr().decode().strip()
+    if user_input:
+        mountpoint = user_input
+    curses.noecho()
+
+    stdscr.addstr("Use x64 architecture? (y/n) [y]: ")
+    stdscr.refresh()
+    curses.echo()
+    arch_input = stdscr.getstr().decode().strip().lower()
+    if arch_input == "n":
+        arch = False
+    curses.noecho()
+
+    partition = f"{dev}1"
+
+    stdscr.addstr(f"\nRunning grub-install on {partition}...\n")
+    stdscr.refresh()
+
+    make_grub(partition=partition, mountpoint=mountpoint, x64=arch)
+
+    stdscr.addstr("Done.\n")
+    stdscr.refresh()
+
+    stdscr.addstr("\nPress any key to continue...")
+    stdscr.refresh()
     stdscr.getch()
     return (None,)
 
@@ -75,7 +119,9 @@ def select_block_device_screen(stdscr):
             stdscr.refresh()
 
 
-def show_current_partitions_screen(stdscr, selected_device: str):
+def show_current_partitions_screen(
+    stdscr, selected_device: str, new_partition: bool = True
+):
     curses.curs_set(1)
 
     device_info = gather_block_info(selected_device)
@@ -105,8 +151,13 @@ def show_current_partitions_screen(stdscr, selected_device: str):
                 f"{'Unknown':<10}{', '.join(m if m else 'None' for m in part['mountpoints'])}\n"
             )
 
-    stdscr.addstr("\nEnter boot partition size in MB (default 100MB): ")
-    stdscr.refresh()
+    if new_partition:
+        stdscr.addstr("\nEnter boot partition size in MB (default 100MB): ")
+        stdscr.refresh()
+    else:
+        stdscr.addstr(
+            "Press 'enter' to continue, 'esc' to pick another block device and 'q' to quit"
+        )
 
     boot_size_str = ""
     while True:
@@ -117,20 +168,22 @@ def show_current_partitions_screen(stdscr, selected_device: str):
 
         elif key == ord("q"):
             sys.exit(0)
-
         elif key in (10, curses.KEY_ENTER):
-            boot_size_mb = None
-            if boot_size_str and boot_size_str.isdigit():
-                boot_size_mb = int(boot_size_str)
+            if new_partition:
+                boot_size_mb = None
+                if boot_size_str and boot_size_str.isdigit():
+                    boot_size_mb = int(boot_size_str)
+                else:
+                    boot_size_mb = 100
+                return new_partitions_screen, selected_device, boot_size_mb
             else:
-                boot_size_mb = 100
-            return new_partitions_screen, selected_device, boot_size_mb
+                return grub_screen, selected_device
 
-        elif key in range(48, 58):  # Number keys 0-9
+        elif new_partition and key in range(48, 58):  # Number keys 0-9
             boot_size_str += chr(key)
             stdscr.addch(chr(key))
 
-        elif key in (127, curses.KEY_BACKSPACE, 8) and boot_size_str:
+        elif new_partition and key in (127, curses.KEY_BACKSPACE, 8) and boot_size_str:
             boot_size_str = boot_size_str[:-1]
             y, x = stdscr.getyx()
             if x > 0:
