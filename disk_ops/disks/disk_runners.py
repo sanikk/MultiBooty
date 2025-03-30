@@ -3,6 +3,18 @@ import json
 
 
 def get_disk_info(devs: list[str]) -> dict:
+    """
+    SUDO
+    Collects info on number of sectors, their size and total device size.
+
+    Args:
+        dev (list[str]): list of devices to collect data on, ["/dev/sda", "/dev/sdb"]
+
+    Returns:
+        dict:   {"sector_size": sector_size,
+                "num_sectors": num_sectors,
+                "size_bytes": size_bytes,}
+    """
     # TODO: move this printing to it's own function that we inject here if using text UI.
     # TODO: make one like this for GUI too, and inject it here if using GUI.
     print("We need sudo to collect device info.")
