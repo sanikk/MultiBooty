@@ -1,3 +1,6 @@
+from sys import exit
+
+
 def format_size(size_bytes):
     for unit in ["B", "KB", "MB", "GB", "TB"]:
         if size_bytes < 1024.0:
@@ -18,3 +21,11 @@ def handle_return_value(stdscr, ret):
 def print_lines(stdscr, lines):
     for line in lines:
         stdscr.addstr(line + "\n")
+
+
+def check_quit_esc(char):
+    if char == 27:
+        return False
+    if char == ord("q") or ord("Q"):
+        exit(0)
+    return True
