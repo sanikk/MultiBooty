@@ -1,4 +1,4 @@
-from disk_ops.runners import run_python_subprocess_with_sudo
+from utils.runners import run_python_subprocess_with_sudo
 import json
 
 
@@ -21,9 +21,7 @@ def get_disk_info(devs: list[str]) -> dict:
     print("We'll be reading sector size and size in bytes")
     print(f"from devices: {devs}.")
     print("This is a read-only op.")
-    ret = run_python_subprocess_with_sudo(
-        "disk_ops/disks/disk_info_linux.py", devs, FileNotFoundError, "No such device."
-    )
+    ret = run_python_subprocess_with_sudo("disk_ops/disks/disk_info_linux.py", devs)
     if ret and ret.returncode == 0:
         device_infos = json.loads(ret.stdout)
         return device_infos

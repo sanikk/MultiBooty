@@ -1,5 +1,4 @@
 import parted
-import subprocess
 import sys
 
 from parted import geometry
