@@ -10,11 +10,11 @@ def is_mounted(mountpoint):
 
 
 def mount_command(dev, mountpoint):
-    run_subprocess_with_sudo("mount", [dev, mountpoint], ValueError, "mount")
+    run_subprocess_with_sudo("mount", [dev, mountpoint])
 
 
 def unmount_command(dev):
-    run_subprocess_with_sudo("umount", [dev], ValueError, "umount")
+    run_subprocess_with_sudo("umount", [dev])
 
 
 def mounted(func):
