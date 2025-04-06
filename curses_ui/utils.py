@@ -26,6 +26,6 @@ def print_lines(stdscr, lines):
 def check_quit_esc(char):
     if char == 27:
         return False
-    if char == ord("q") or ord("Q"):
+    if char == ord("q") or char == ord("Q"):
         exit(0)
     return True
