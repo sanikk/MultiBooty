@@ -2,13 +2,15 @@ from invoke.tasks import task
 from disk_ops.disks.disk_runners import get_disk_info
 from disk_ops.disks.block_devices import get_all_block_devices
 
-from disk_ops.runners import (
+from utils.runners import (
     run_python_subprocess_with_sudo,
 )
 from disk_ops.partitions.partition_runners import (
     propose_partitions,
     make_partitions,
 )
+from grub.grub_runners import make_grub
+from utils.mounting import is_mounted, mounted
 
 
 @task
@@ -46,3 +48,29 @@ def iso(c):
 @task
 def parttest(_):
     print(make_partitions("/dev/sdc", 2048, 208895, 208896, 30865408))
+
+
+# @mounted
+# def testfunc(partition, mountpoint):
+#     print("hello")
+#     input("halted..partition should be mounted now")
+#
+
+
+@task
+def mounttest(_):
+    print(run_python_subprocess_with_sudo("mnttest.py", [], ValueError, "blob"))
+
+
+# def make_grub(partition: str, mountpoint: str, x64: bool = True):
+@task
+def grubtest(_):
+    # print(make_grub(partition="/dev/sdc1", "/mnt", True))
+    ret = make_grub(partition="/dev/sdc1", mountpoint="/mnt", x64=True)
+    print(ret.stdout)
+    print(ret.stderr)
+
+
+@task
+def ismountedtest(_):
+    print(is_mounted("/mnt"))
