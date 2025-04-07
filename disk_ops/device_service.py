@@ -1,7 +1,6 @@
-from disk_ops.disks import block_devices
 from disk_ops.disks.block_devices import get_all_block_devices
 from disk_ops.disks.disk_runners import get_disk_info
-from disk_ops.partitions.partition_runners import propose_partitions
+from disk_ops.partitions.partition_runners import propose_partitions, make_partitions
 
 
 class DeviceService:
@@ -41,6 +40,6 @@ class DeviceService:
         return partitions_info
 
     def make_partitions(self):
-        if not self._suggested_partititions:
+        if not self._device or not self._suggested_partititions:
             return
-        pass
+        make_partitions(self._device, **self._suggested_partititions)
