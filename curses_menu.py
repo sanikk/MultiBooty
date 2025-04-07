@@ -10,8 +10,7 @@ from disk_ops.device_service import DeviceService
 
 menu_items = [
     ("Select device", select_block_device_screen),
-    ("Device info", show_device_info_screen),
-    ("New partitions", new_partitions_screen),
+    ("Partitioning", show_device_info_screen),
     ("Install GRUB", install_grub_screen),
     ("Configure GRUB", configure_grub_screen),
 ]
