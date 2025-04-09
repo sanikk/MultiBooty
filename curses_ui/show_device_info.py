@@ -32,6 +32,7 @@ def show_partitions(stdscr, device_service):
                 f"{part['fstype'] or 'Unknown':<10}{part['size']:<10}"
                 f"{'Unknown':<10}{', '.join(m if m else 'None' for m in part['mountpoints'])}\n"
             )
+    stdscr.refresh()
     return True
 
 

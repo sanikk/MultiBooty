@@ -1,5 +1,10 @@
 from sys import exit
 
+"""
+Mostly just sketches for recycleable UI components.
+This one is unsorted first drafts.
+"""
+
 
 def format_size(size_bytes):
     for unit in ["B", "KB", "MB", "GB", "TB"]:
