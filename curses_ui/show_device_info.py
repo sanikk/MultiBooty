@@ -1,3 +1,4 @@
+from curses_ui.prompts import text_prompt
 from curses_ui.utils import check_quit_esc
 from disk_ops.device_service import DeviceService
 from disk_ops.disks.gather_block_info import gather_block_info
@@ -69,15 +70,26 @@ def show_device_info_screen(stdscr, device_service: DeviceService):
 
     """
     stdscr.clear()
-    curses.curs_set(1)
     ret = show_partitions(stdscr, device_service)
-    stdscr.addstr("\nPress 'esc' to pick another block device, 'q' to quit\n")
-    if ret:
-        stdscr.addstr("or Enter boot partition size in MB (default 100MB): ")
-    stdscr.refresh()
+    boot_size = 100
+    boot_fs = "fat32"
+    root_fs = "ext4 no journaling"
+    selected = 4
 
-    boot_size_str = ""
     while True:
+
+        options = [
+            f"Boot partition size: {boot_size} MB",
+            f"Boot partition file system: {boot_fs}",
+            f"Root partition size: rest of the disk",
+            f"Root partition file system: {root_fs}",
+            "Partition disk",
+        ]
+
+        for idx, label in enumerate(options):
+            attr = curses.A_REVERSE if idx == selected else curses.A_NORMAL
+            stdscr.addstr(7 + idx, 2, label, attr)
+        stdscr.refresh()
         key = stdscr.getch()
 
         if key == 27:
@@ -85,29 +97,30 @@ def show_device_info_screen(stdscr, device_service: DeviceService):
 
         elif key == ord("q"):
             sys.exit(0)
+
+        elif key in (curses.KEY_UP, ord("k")):
+            selected = (selected - 1) % len(options)
+        elif key in (curses.KEY_DOWN, ord("j")):
+            selected = (selected + 1) % len(options)
+
         elif key in (10, curses.KEY_ENTER):
-            boot_size_mb = None
-            if boot_size_str and boot_size_str.isdigit():
-                boot_size_mb = int(boot_size_str)
-            else:
-                boot_size_mb = 100
-            if suggest_partitions(stdscr, device_service, boot_size_mb):
-                stdscr.clear()
-                if show_partitions(stdscr, device_service):
-                    stdscr.addstr("\nPress any key to continue..")
-                    stdscr.getch()
-                return 2
-            return 0
-
-        elif key in range(48, 58):  # Number keys 0-9
-            boot_size_str += chr(key)
-            stdscr.addch(chr(key))
-
-        elif key in (127, curses.KEY_BACKSPACE, 8) and boot_size_str:
-            boot_size_str = boot_size_str[:-1]
-            y, x = stdscr.getyx()
-            if x > 0:
-                stdscr.move(y, x - 1)
-                stdscr.delch()
+            if selected == 0:
+                ret = text_prompt(stdscr, 7, 22)
+                if ret and ret.isdigit():
+                    boot_size = int(ret)
+            if selected == 4:
+                if suggest_partitions(stdscr, device_service, boot_size):
+                    stdscr.addstr("Partitioning done.\n")
+                    stdscr.addstr(f"Making boot file system ({boot_fs})...")
+                    device_service.make_boot_fs()
+                    stdscr.addstr("Done\n")
+                    stdscr.addstr(f"Making root file system ({root_fs})...")
+                    device_service.make_root_fs()
+                    stdscr.addstr("Done\n")
+                    if show_partitions(stdscr, device_service):
+                        stdscr.addstr("\nPress any key to continue..")
+                        stdscr.getch()
+                        return 2
+                return 0
 
         stdscr.refresh()

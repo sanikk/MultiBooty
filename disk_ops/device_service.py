@@ -1,6 +1,7 @@
 from disk_ops.disks.block_devices import get_all_block_devices
 from disk_ops.disks.disk_runners import get_disk_info
 from disk_ops.partitions.partition_runners import propose_partitions, make_partitions
+from disk_ops.make_filesystems import make_fat32_filesystem, make_ext4_filesystem
 
 
 class DeviceService:
@@ -47,7 +48,7 @@ class DeviceService:
         make_partitions(self._device, **self._suggested_partititions)
 
     def make_boot_fs(self):
-        pass
+        make_fat32_filesystem(self._device, 1)
 
     def make_root_fs(self):
-        pass
+        make_ext4_filesystem(self._device, 2)

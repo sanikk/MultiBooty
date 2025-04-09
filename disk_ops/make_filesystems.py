@@ -1,14 +1,14 @@
 from utils.runners import run_subprocess_with_sudo
 
 
-def make_boot_filesystem(dev, partition):
+def make_fat32_filesystem(dev, partition):
     """
     Make FAT32 filesystem.
     """
     run_subprocess_with_sudo("mkfs.fat", ["-F32", f"{dev}{partition}"])
 
 
-def make_ext_filesystem(dev, partition):
+def make_ext4_filesystem(dev, partition):
     """
     Make ext4 filesystem with no journaling.
     """
