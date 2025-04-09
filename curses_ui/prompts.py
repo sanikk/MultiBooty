@@ -7,14 +7,15 @@ from typing import Callable
 # from curses_ui import controls
 
 
-def text_prompt(stdscr, offset):
+def text_prompt(stdscr, line, col):
     curses.echo()
-    y, x = stdscr.getyx()
-    stdscr.move(y, offset)
+    stdscr.move(line, col)
     stdscr.clrtoeol()
     stdscr.refresh()
     input_str = stdscr.getstr().decode("utf-8")
-    stdscr.noecho()
+    curses.noecho()
+    if input_str:
+        return input_str
 
 
 def numeric_prompt(stdscr, offset, default):
