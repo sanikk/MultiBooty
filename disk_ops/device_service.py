@@ -10,6 +10,8 @@ class DeviceService:
         self._number_of_sectors = number_of_sectors
         self._sector_size = sector_size
         self._suggested_partititions = None
+        self._boot_fs = "fat32"
+        self._root_fs = "ext4"
 
     def get_device(self):
         return self._device
@@ -43,3 +45,9 @@ class DeviceService:
         if not self._device or not self._suggested_partititions:
             return
         make_partitions(self._device, **self._suggested_partititions)
+
+    def make_boot_fs(self):
+        pass
+
+    def make_root_fs(self):
+        pass
