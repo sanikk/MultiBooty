@@ -46,7 +46,7 @@ def old_install_grub_screen(stdscr, dev):
     return (None,)
 
 
-def install_grub_screen(stdscr, grub_service):
+def install_grub_screen(stdscr, device_service, grub_service):
     curses.curs_set(1)
     mountpoint = "/mnt"
     arch = "amd64"
@@ -97,4 +97,5 @@ def install_grub_screen(stdscr, grub_service):
                 )
             elif selected == 2:
                 grub_service.install_grub()
+                return 3
                 break

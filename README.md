@@ -7,11 +7,28 @@ First goal is to let the user setup the media and boot into a linux installer. W
 
 The second part is to have a package manager and local package repository for this.
 
-Usage case example:
+### Usage case example:
 
 You want to install Debian(s) somewhere with no/bad internet. You know you have to install 'Discord' there, which should be pretty up-to-date to function without
-bypassing the version check. So before going to the place with no/bad internet you can slap an USB stick into your computer, put the latest Debian ISO there, use the package manager part to fetch all the packages needed to install the latest version of discord. This app should be able to figure out which packages need to be updated and load them on to the USB stick. When you are on location you can just connect the USB stick to a port, run the normal Debian installer and end up with a functioning system and functioning up-to-date discord.
+bypassing the version check. 
 
+So before going to the place with no/bad internet you can slap an USB stick into your computer, put the latest Debian ISO there, use the package manager part to fetch all the packages needed to install the latest version of discord. This app should be able to figure out which packages need to be updated and load them on to the USB stick. 
+
+When you are on location you can just connect the USB stick to a port, run the normal Debian installer and end up with a functioning system and functioning up-to-date discord.
+
+## Instructions
+
+Clone this repository. Use
+```bash
+poetry install
+```
+to install dependencies.
+
+Use
+```bash
+poetry run invoke curses
+```
+to run the app with curses interface.
 
 ## Configuration:
 ### None of this has been implemented yet.

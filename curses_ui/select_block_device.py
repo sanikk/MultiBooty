@@ -1,8 +1,11 @@
 from disk_ops.device_service import DeviceService
 from curses_ui.utils import check_quit_esc, format_size
+from grub.grub_service import GrubService
 
 
-def select_block_device_screen(stdscr, device_service: DeviceService):
+def select_block_device_screen(
+    stdscr, device_service: DeviceService, grub_service: GrubService
+):
     """
     This is first screen.
     User can select a usb device here.

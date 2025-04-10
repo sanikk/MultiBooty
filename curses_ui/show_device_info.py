@@ -1,12 +1,11 @@
-from curses_ui.prompts import text_prompt
-from curses_ui.utils import check_quit_esc
-from disk_ops.device_service import DeviceService
-
-# from disk_ops.disks.gather_block_info import gather_block_info
 import curses
 import sys
 
-from disk_ops.disks.disk_runners import wait_device
+from curses_ui.prompts import text_prompt
+from curses_ui.utils import check_quit_esc
+
+from disk_ops.device_service import DeviceService
+from grub.grub_service import GrubService
 
 
 def show_partitions(stdscr, device_service: DeviceService):
@@ -71,7 +70,9 @@ def suggest_partitions(stdscr, device_service, boot_size_mb):
         stdscr.refresh()
 
 
-def show_device_info_screen(stdscr, device_service: DeviceService):
+def show_device_info_screen(
+    stdscr, device_service: DeviceService, grub_service: GrubService
+):
     """
     Second screen
     User can see the current partitioning for the device, and enter a desired boot partition size.
