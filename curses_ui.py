@@ -1,6 +1,5 @@
 import curses
 import sys
-from curses_ui.new_partitions import new_partitions_screen
 from curses_ui.select_block_device import select_block_device_screen
 from curses_ui.show_device_info import show_device_info_screen
 from curses_ui.install_grub import install_grub_screen
