@@ -1,3 +1,4 @@
+from disk_ops.disks.wait_for_device import wait_for_device
 from utils.runners import run_python_subprocess_with_sudo
 import json
 
@@ -33,3 +34,7 @@ def get_disk_info(devs: list[str]) -> dict:
             if not ret.stderr:
                 print("No devices found")
         return {}
+
+
+def wait_device(path, timeout=5):
+    run_python_subprocess_with_sudo("disk_ops/disks/wait_for_device.py", path)

@@ -1,9 +1,16 @@
 from utils.runners import run_subprocess_with_sudo
 from utils.mounting import mounted
 
+architectures = {
+    "amd64": "x86_64-efi",
+    "i386": "i386-efi",
+    # "arm"
+}
+
 
 @mounted
-def make_grub(partition: str, mountpoint: str, x64: bool = True):
+# def make_grub(partition: str, mountpoint: str, x64: bool = True):
+def make_grub(partition: str, mountpoint: str, architecture: str):
     """
     Does grub-install on a given partition.
 
@@ -14,22 +21,24 @@ def make_grub(partition: str, mountpoint: str, x64: bool = True):
     Returns:
         bool: True for success
     """
-    target = "x86_64-efi"
-    if not x64:
-        target = "i386-efi"
+    if (
+        not partition
+        or not mountpoint
+        or not architecture
+        or architecture not in architectures
+    ):
+        return
     try:
         ret = run_subprocess_with_sudo(
             "grub-install",
             [
                 # "--removable",
                 # "--target=x86_64-efi",
-                f"--target={target}",
+                f"--target={architectures[architecture]}",
                 f"--efi-directory={mountpoint}",
                 "--bootloader-id=GRUB",
                 f"--boot-directory={mountpoint}/boot",
             ],
-            ValueError,
-            "glub",
         )
         # umount = umount_partition(dev, 1)
         return ret
