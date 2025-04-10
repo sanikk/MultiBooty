@@ -1,15 +1,21 @@
 from curses_ui.prompts import text_prompt
 from curses_ui.utils import check_quit_esc
 from disk_ops.device_service import DeviceService
-from disk_ops.disks.gather_block_info import gather_block_info
+
+# from disk_ops.disks.gather_block_info import gather_block_info
 import curses
 import sys
 
+from disk_ops.disks.disk_runners import wait_device
 
-def show_partitions(stdscr, device_service):
-    device_info = gather_block_info(device_service.get_device())
+
+def show_partitions(stdscr, device_service: DeviceService):
+    device_info = device_service.device_info()
+    # stdscr.addstr(f"{device_info=}\n")
     if not device_info:
         stdscr.addstr("No device found.\n")
+        # stdscr.addstr(f"{device_service.get_device()=}")
+        # stdscr.addstr(f"{device_info=}")
         stdscr.addstr("Press any key to continue...")
         stdscr.getch()
         return False
@@ -52,12 +58,14 @@ def suggest_partitions(stdscr, device_service, boot_size_mb):
     stdscr.addstr(
         "\nThis will get written to disk. Press 'Y' to confirm, 'Escape' to return, or 'q' to quit.\n"
     )
+    stdscr.refresh()
     while True:
         key = stdscr.getch()
         if not check_quit_esc(key):
             return False
         if key == ord("Y"):
             stdscr.addstr(f"Partitioning {partitions_info["device"]}...\n")
+            stdscr.refresh()
             device_service.make_partitions()
             return True
         stdscr.refresh()
@@ -71,6 +79,8 @@ def show_device_info_screen(stdscr, device_service: DeviceService):
     """
     stdscr.clear()
     ret = show_partitions(stdscr, device_service)
+    if not ret:
+        return
     boot_size = 100
     boot_fs = "fat32"
     root_fs = "ext4 no journaling"
@@ -112,12 +122,23 @@ def show_device_info_screen(stdscr, device_service: DeviceService):
                 if suggest_partitions(stdscr, device_service, boot_size):
                     stdscr.addstr("Partitioning done.\n")
                     stdscr.addstr(f"Making boot file system ({boot_fs})...")
+                    stdscr.refresh()
+
+                    # I think udev needs to notice the new partitions before running mkfs on them,
+                    # so I put a little timeout here.
+                    device_service.wait_for_partition(f"{device_service.get_device()}1")
+
                     device_service.make_boot_fs()
                     stdscr.addstr("Done\n")
                     stdscr.addstr(f"Making root file system ({root_fs})...")
+                    stdscr.refresh()
                     device_service.make_root_fs()
                     stdscr.addstr("Done\n")
+                    stdscr.refresh()
+                    # i try adding a wait here to avoid some spillover output
+                    # device_service.wait_for_partition(f"{device_service.get_device()}2")
                     if show_partitions(stdscr, device_service):
+                        stdscr.refresh()
                         stdscr.addstr("\nPress any key to continue..")
                         stdscr.getch()
                         return 2
