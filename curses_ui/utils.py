@@ -34,3 +34,8 @@ def check_quit_esc(char):
     if char == ord("q") or char == ord("Q"):
         exit(0)
     return True
+
+
+def print_key_instructions(stdscr):
+    stdscr.addstr(6, 0, "↑↓ or jk to move | Enter to select | q to quit")
+    stdscr.refresh()

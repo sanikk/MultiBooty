@@ -2,10 +2,6 @@ import curses
 import sys
 from typing import Callable
 
-# import curses_ui.controls
-
-# from curses_ui import controls
-
 
 def text_prompt(stdscr, line, col):
     curses.echo()
@@ -38,8 +34,6 @@ def numeric_prompt(stdscr, offset, default):
             if x > 0:
                 stdscr.move(y, x - 1)
                 stdscr.delch()
-        elif not numeric:
-            text_str += chr(key)
 
 
 def selection_box(
