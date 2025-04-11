@@ -2,13 +2,14 @@ import curses
 import sys
 
 from curses_ui.prompts import text_prompt
-from curses_ui.utils import check_quit_esc
+from curses_ui.utils import check_quit_esc, print_key_instructions
 
 from disk_ops.device_service import DeviceService
 from grub.grub_service import GrubService
 
 
 def show_partitions(stdscr, device_service: DeviceService):
+    # HACK: ok this is terrible. complete rewrite needed.
     device_info = device_service.device_info()
     # stdscr.addstr(f"{device_info=}\n")
     if not device_info:
@@ -100,7 +101,9 @@ def show_device_info_screen(
         for idx, label in enumerate(options):
             attr = curses.A_REVERSE if idx == selected else curses.A_NORMAL
             stdscr.addstr(7 + idx, 2, label, attr)
-        stdscr.refresh()
+
+        print_key_instructions(stdscr)
+
         key = stdscr.getch()
 
         if key == 27:
