@@ -1,7 +1,4 @@
-from pathlib import Path
 from utils.runners import run_subprocess_with_sudo
-
-from subprocess import run
 
 
 def is_mounted(mountpoint):
