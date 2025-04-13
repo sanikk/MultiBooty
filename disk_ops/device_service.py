@@ -1,13 +1,11 @@
-import subprocess
 from disk_ops.disks.block_devices import get_all_block_devices
 from disk_ops.disks.disk_runners import get_disk_info, wait_device
 from disk_ops.disks.gather_block_info import gather_block_info
 from disk_ops.partitions.partition_runners import propose_partitions, make_partitions
-from disk_ops.make_filesystems import (
+from disk_ops.filesystem.filesystem_runners import (
     make_fat32_filesystem,
     make_ext4_filesystem,
 )
-import json
 
 
 class DeviceService:
@@ -18,7 +16,9 @@ class DeviceService:
         self._sector_size = sector_size
         self._suggested_partititions = None
         self._boot_fs = "fat32"
+        self._boot_uuid = None
         self._root_fs = "ext4"
+        self._root_uuid = None
 
     def get_device(self):
         return self._device
@@ -26,7 +26,8 @@ class DeviceService:
     def get_number_of_sectors(self):
         return self._number_of_sectors
 
-    def set_device(self, device, sector_size, number_of_sectors, size_in_bytes):
+    def set_device(self, device, sector_size, number_of_sectors, *args):
+        _ = args
         self._device = device
         self._number_of_sectors = number_of_sectors
         self._sector_size = sector_size
@@ -65,6 +66,7 @@ class DeviceService:
         make_fat32_filesystem(self._device, 1)
 
     def make_root_fs(self):
+        # TODO: set uuid here?
         make_ext4_filesystem(self._device, 2)
 
     def wait_for_partition(self, partition):

@@ -3,7 +3,8 @@ import sys
 from curses_ui.select_block_device import select_block_device_screen
 from curses_ui.show_device_info import show_device_info_screen
 from curses_ui.install_grub import install_grub_screen
-from curses_ui.configure_grub import configure_grub_screen
+
+# from curses_ui.configure_grub import configure_grub_screen
 from curses_ui.utils import check_quit_esc
 
 from disk_ops.device_service import DeviceService
@@ -28,7 +29,7 @@ def main_menu(stdscr, device_service: DeviceService, grub_service: GrubService):
         stdscr.addstr(f"Number of sectors: {device_service.get_number_of_sectors()}\n")
         h, w = stdscr.getmaxyx()
 
-        for idx, (item, func) in enumerate(menu_items):
+        for idx, (item, _) in enumerate(menu_items):
             x = w // 2 - len(item) // 2
             y = h // 2 - len(menu_items) // 2 + idx
             if idx == selected:

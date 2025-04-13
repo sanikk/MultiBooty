@@ -15,6 +15,8 @@ def install_grub_screen(stdscr, grub_service, **kwargs) -> int:
     Returns:
         next_screen(int): the index of the next screen to use as default.
     """
+    _ = kwargs
+
     mountpoint = "/mnt"
     arch = "amd64"
     selected = 2
