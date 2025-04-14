@@ -1,4 +1,3 @@
-from disk_ops.disks.wait_for_device import wait_for_device
 from utils.runners import run_python_subprocess_with_sudo
 import json
 
@@ -36,5 +35,17 @@ def get_disk_info(devs: list[str]) -> dict:
         return {}
 
 
-def wait_device(path, timeout=5):
-    run_python_subprocess_with_sudo("disk_ops/disks/wait_for_device.py", path)
+# def wait_device(**kwargs):
+#     run_python_subprocess_with_sudo("disk_ops/disks/wait_for_device.py", path)
+
+
+def wait_for_device_node(func):
+    def wrapper(partition, **kwargs):
+        ret = run_python_subprocess_with_sudo(
+            "disk_ops/disks/wait_for_device_node.py", [partition]
+        )
+        if ret and ret.returncode == 0:
+            return func(partition=partition, **kwargs)
+        raise RuntimeError(f"Timeout waiting for {partition}")
+
+    return wrapper

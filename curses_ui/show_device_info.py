@@ -130,7 +130,8 @@ def show_device_info_screen(
 
                     # I think udev needs to notice the new partitions before running mkfs on them,
                     # so I put a little timeout here.
-                    device_service.wait_for_partition(f"{device_service.get_device()}1")
+                    # Ok made a decorator out of this.
+                    # device_service.wait_for_partition(f"{device_service.get_device()}1")
 
                     device_service.make_boot_fs()
                     stdscr.addstr("Done\n")

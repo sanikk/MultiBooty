@@ -1,5 +1,5 @@
 from disk_ops.disks.block_devices import get_all_block_devices
-from disk_ops.disks.disk_runners import get_disk_info, wait_device
+from disk_ops.disks.disk_runners import get_disk_info
 from disk_ops.disks.gather_block_info import gather_block_info
 from disk_ops.partitions.partition_runners import propose_partitions, make_partitions
 from disk_ops.filesystem.filesystem_runners import (
@@ -63,11 +63,21 @@ class DeviceService:
         This needs udev to be populated with the new partitions. Or something like that.
         I use check before running this
         """
-        make_fat32_filesystem(self._device, 1)
+        make_fat32_filesystem(partition=f"{self._device}1")
 
     def make_root_fs(self):
         # TODO: set uuid here?
-        make_ext4_filesystem(self._device, 2)
+        make_ext4_filesystem(f"{self._device}2")
 
-    def wait_for_partition(self, partition):
-        wait_device(partition)
+
+#     def read_boot_uuid(self):
+#         if not self._device:
+#             return False
+#         return True
+#
+#     def read_root_uuid(self):
+#         if not self._device:
+#             return False
+#
+#             # bootret = subprocess.run(["blkid", "{self._device}1"])
+#         return True
