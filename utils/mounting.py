@@ -6,6 +6,11 @@ def is_mounted(mountpoint):
         return any(line.split()[1] == mountpoint for line in f)
 
 
+def mountpoint_is_free(mountpoint):
+    with open("/proc/mounts") as f:
+        return any(line.split()[1] == mountpoint for line in f)
+
+
 def mount_command(dev, mountpoint):
     run_subprocess_with_sudo("mount", [dev, mountpoint])
 
@@ -25,5 +30,15 @@ def mounted(func):
             return func(partition, mountpoint, *args, **kwargs)
         finally:
             unmount_command(partition)
+
+    return wrapper
+
+
+def partition_unmounted(func):
+    def wrapper(partition, **kwargs):
+        with open("/proc/mounts") as f:
+            if any(line.split()[0] == partition for line in f):
+                return
+            return func(partition=partition, **kwargs)
 
     return wrapper

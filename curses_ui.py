@@ -26,7 +26,7 @@ def main_menu(stdscr, device_service: DeviceService, grub_service: GrubService):
     while True:
         stdscr.clear()
         stdscr.addstr(f"Device: {device_service.get_device()}\n")
-        stdscr.addstr(f"Number of sectors: {device_service.get_number_of_sectors()}\n")
+        #         stdscr.addstr(f"Number of sectors: {device_service.get_number_of_sectors()}\n")
         h, w = stdscr.getmaxyx()
 
         for idx, (item, _) in enumerate(menu_items):

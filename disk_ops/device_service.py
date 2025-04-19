@@ -5,36 +5,52 @@ from disk_ops.partitions.partition_runners import propose_partitions, make_parti
 from disk_ops.filesystem.filesystem_runners import (
     make_fat32_filesystem,
     make_ext4_filesystem,
+    read_partition_uuid,
+    make_root_folders,
 )
 
 
 class DeviceService:
 
-    def __init__(self, device=None, number_of_sectors=None, sector_size=None):
+    def __init__(self, device=None):
         self._device = device
-        self._number_of_sectors = number_of_sectors
-        self._sector_size = sector_size
+
         self._suggested_partititions = None
         self._boot_fs = "fat32"
         self._boot_uuid = None
         self._root_fs = "ext4"
         self._root_uuid = None
 
+        self._mountpoint = None
+
     def get_device(self):
         return self._device
 
-    def get_number_of_sectors(self):
-        return self._number_of_sectors
+    def get_boot_uuid(self) -> str | None:
+        if self._boot_uuid:
+            return self._boot_uuid
 
-    def set_device(self, device, sector_size, number_of_sectors, *args):
+    def get_root_uuid(self) -> str | None:
+        if self._root_uuid:
+            return self._root_uuid
+
+    def set_device(
+        self,
+        device,
+        *args,
+    ):
         _ = args
         self._device = device
-        self._number_of_sectors = number_of_sectors
-        self._sector_size = sector_size
 
-    def device_info(self):
+    def get_mountpoint(self) -> str | None:
+        return self._mountpoint
+
+    def set_mountpoint(self, mountpoint: str):
+        self._mountpoint = mountpoint
+
+    def device_info(self) -> dict[str, str]:
         if not self._device:
-            return "self._device not set?"
+            return {"error": "self._device not set?"}
         disk_info = gather_block_info(self._device)
         return disk_info
 
@@ -66,18 +82,31 @@ class DeviceService:
         make_fat32_filesystem(partition=f"{self._device}1")
 
     def make_root_fs(self):
-        # TODO: set uuid here?
         make_ext4_filesystem(f"{self._device}2")
 
+    def read_boot_uuid(self) -> bool:
+        if not self._device:
+            return False
+        ret = read_partition_uuid(f"{self._device}1")
+        if ret:
+            self._boot_uuid = ret
+            return True
+        return False
 
-#     def read_boot_uuid(self):
-#         if not self._device:
-#             return False
-#         return True
-#
-#     def read_root_uuid(self):
-#         if not self._device:
-#             return False
-#
-#             # bootret = subprocess.run(["blkid", "{self._device}1"])
-#         return True
+    def read_root_uuid(self) -> bool:
+        if not self._device:
+            return False
+
+        ret = read_partition_uuid(f"{self._device}2")
+        if ret:
+            self._root_uuid = ret
+            return True
+        return False
+
+    def make_roots_folders(self) -> bool:
+        if not self._device or not self._mountpoint:
+            print("args not set")
+            return False
+        return make_root_folders(
+            partition=f"{self._device}2", mountpoint=self._mountpoint
+        )

@@ -1,11 +1,9 @@
 from disk_ops.disks.disk_runners import wait_for_device_node
 from utils.mounting import mounted, partition_unmounted
-from utils.runners import run_subprocess_with_sudo
-from pathlib import Path
-from subprocess import run
+from utils.runners import run_python_subprocess_with_sudo, run_subprocess_with_sudo
 
 
-# @partition_unmounted
+@partition_unmounted
 @wait_for_device_node
 def make_fat32_filesystem(partition):
     """
@@ -19,7 +17,7 @@ def make_fat32_filesystem(partition):
     return False
 
 
-# @partition_unmounted
+@partition_unmounted
 @wait_for_device_node
 def make_ext4_filesystem(partition):
     """
@@ -47,22 +45,24 @@ def label_root(partition: str, label: str = "MultiBootyRoot"):
 
 
 @mounted
+@wait_for_device_node
 def make_root_folders(partition, mountpoint):
-    """
-    Makes folders on the root partition.
-    Decorator needs partition.
+    ret = run_python_subprocess_with_sudo(
+        "disk_ops/filesystem/make_root_folders.py", [partition, mountpoint]
+    )
+    print(ret)
+    if ret and ret.returncode == 0:
+        return True
 
-    """
-    _ = partition
-
-    for dir in ["isos", "MultiBooty", "packages"]:
-        Path(mountpoint, dir).mkdir()
-    for dir in ["arch_linux", "debian"]:
-        Path(mountpoint, "packages", dir).mkdir()
+    return False
 
 
 @wait_for_device_node
 def read_partition_uuid(partition):
-    ret = run(["blkid", "-s", "UUID", "-o", "value", partition])
+    """
+    Reads UUID of partition.
+    Decorator needs partition.
+    """
+    ret = run_subprocess_with_sudo("blkid", ["-s", "UUID", "-o", "value", partition])
     if ret and ret.returncode == 0:
-        return ret.stdout
+        return ret.stdout.strip()
