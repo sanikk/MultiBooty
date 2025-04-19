@@ -1,5 +1,4 @@
 from curses import A_REVERSE, window
-
 from disk_ops.device_service import DeviceService
 
 

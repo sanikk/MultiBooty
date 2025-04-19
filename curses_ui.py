@@ -28,15 +28,15 @@ menu_items = [
 def main_menu(stdscr: window, device_service: DeviceService, grub_service: GrubService):
     curs_set(0)
     selected = 0
-    stdscr.clear()
     while True:
+        stdscr.clear()
+
         print_top(stdscr=stdscr, device_service=device_service)
 
         print_menu(stdscr=stdscr, menu_items=menu_items, selected=selected)
 
-        stdscr.addstr("\n\n")
-
         print_key_instructions(stdscr=stdscr)
+
         stdscr.refresh()
 
         key = stdscr.getch()

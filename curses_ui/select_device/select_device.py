@@ -1,20 +1,26 @@
 from curses import window
+from curses_ui.common.curses_runner import curses_runner
 from curses_ui.common.prints import print_key_instructions, print_top
 from disk_ops.device_service import DeviceService
 from curses_ui.utils import check_quit_esc, format_size
 
 
-def select_device(stdscr: window, device_service, **kwargs):
+def select_device(stdscr: window, device_service: DeviceService, **kwargs):
     _ = kwargs
 
     selected = 0
 
     while True:
         stdscr.clear()
-        print_top(stdscr=stdscr, device_service=device_service)
+        stdscr.refresh()
 
-        disk_info = device_service.list_devices()
+        disk_info = curses_runner(fn=device_service.list_devices, stdscr=stdscr)
         devices = [(k, *v.values()) for k, v in disk_info.items()]
+
+        stdscr.clear()
+        stdscr.refresh()
+
+        print_top(stdscr=stdscr, device_service=device_service)
 
         stdscr.addstr(
             3, 0, "#  dev          sector size  number of sectors  total size\n"
@@ -26,8 +32,10 @@ def select_device(stdscr: window, device_service, **kwargs):
             stdscr.addstr(
                 f"{i}. {dev:12} {sector_size:12} {num_sectors:16} {size_str}\n"
             )
+
+        print_key_instructions(stdscr=stdscr)
         char = stdscr.getch()
-        # TODO: handle char
+        # TODO: make this selectable with u/d/etc
 
         if not check_quit_esc(char):
             return 0
