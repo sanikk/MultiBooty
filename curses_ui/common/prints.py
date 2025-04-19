@@ -1,6 +1,6 @@
 from curses import A_REVERSE, window
-import curses
-import sys
+
+from disk_ops.device_service import DeviceService
 
 
 def print_key_instructions(stdscr: window):
@@ -9,12 +9,11 @@ def print_key_instructions(stdscr: window):
     )
     y = stdscr.getyx()[0]
     x = stdscr.getmaxyx()[1] // 2 - len(instruction_text) // 2
-    # stdscr.addstr("Number or Enter to select | ↑↓ or jk to move | q to quit")
     stdscr.addstr(y + 2, x, instruction_text)
     stdscr.refresh()
 
 
-def print_menu(stdscr, menu_items, selected, y_offset=0):
+def print_menu(stdscr: window, menu_items: list, selected: int, y_offset: int = 0):
     h, w = stdscr.getmaxyx()
 
     for idx, (item, _) in enumerate(menu_items):
@@ -31,7 +30,7 @@ def print_menu(stdscr, menu_items, selected, y_offset=0):
     stdscr.refresh()
 
 
-def print_top(stdscr: window, device_service):
+def print_top(stdscr: window, device_service: DeviceService):
     """
     Draws the top box of each screen, with selected device.
     """

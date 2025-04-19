@@ -51,7 +51,7 @@ def main_menu(stdscr: window, device_service: DeviceService, grub_service: GrubS
                 stdscr=stdscr, device_service=device_service, grub_service=grub_service
             )
         elif key in map(ord, "123456"):
-            menu_items[(key - ord("0"))][1](
+            menu_items[key - ord("0") - 1][1](
                 stdscr=stdscr, device_service=device_service, grub_service=grub_service
             )
 
