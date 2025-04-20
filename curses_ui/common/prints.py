@@ -15,7 +15,7 @@ def print_key_instructions(stdscr: window):
 def print_menu(stdscr: window, menu_items: list, selected: int, y_offset: int = 0):
     h, w = stdscr.getmaxyx()
 
-    for idx, (item, _) in enumerate(menu_items):
+    for idx, item in enumerate(menu_items):
         y = h // 2 - len(menu_items) // 2 + idx + y_offset
         item = f"{idx + 1}. {item}"
         x = w // 2 - len(item) // 2
@@ -33,6 +33,11 @@ def print_top(stdscr: window, device_service: DeviceService):
     """
     Draws the top box of each screen, with selected device.
     """
-    stdscr.addstr(0, 0, f"Device: {device_service.get_device()}")
-    stdscr.addstr(1, 0, "#" * (stdscr.getmaxyx()[1] - 1) + "\n")
+    device, sector_size, number_of_sectors = device_service.get_device()
+    stdscr.addstr(
+        0,
+        0,
+        f"Device: {device}\nSector size: {sector_size}\nNumber of sectors: {number_of_sectors}",
+    )
+    stdscr.addstr(4, 0, "#" * (stdscr.getmaxyx()[1] - 1) + "\n")
     stdscr.refresh()

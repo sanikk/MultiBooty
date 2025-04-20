@@ -60,5 +60,8 @@ def install_grub_screen(stdscr, grub_service, **kwargs) -> int:
                 )
 
             elif selected == 2:
+                stdscr.addstr("Installing grub...")
+                stdscr.refresh()
                 grub_service.install_grub()
+                stdscr.addstr("Done")
                 return 3
