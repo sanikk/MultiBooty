@@ -1,11 +1,84 @@
 import curses
 import sys
-
+from curses import window
+from curses_ui.common.curses_runner import curses_runner
+from curses_ui.common.prints import print_menu, print_top
 from curses_ui.prompts import text_prompt
 from curses_ui.utils import check_quit_esc, print_key_instructions
 
 from disk_ops.device_service import DeviceService
 from grub.grub_service import GrubService
+
+
+def print_partitions(stdscr: window, device_info: dict):
+    stdscr.addstr(
+        f"{'Identifier':<15}{'Name':<32}{'FS':<12}{'Size':<10}{'Mount Points'}\n"
+    )
+    stdscr.addstr("-" * 80 + "\n")
+
+    stdscr.addstr(
+        f"/dev/{device_info['name']:<14}{(device_info['vendor'] or '') + ' ' + (device_info['model'] or ''):<30}"
+        f"{device_info['fstype'] or 'Unknown':<10}{device_info['size']:<10}"
+        f"{'Unknown':<10}{', '.join(m if m else 'None' for m in device_info['mountpoints'])}\n"
+    )
+    if "children" in device_info and device_info["children"]:
+        for idx, part in enumerate(device_info["children"]):
+            stdscr.addstr(
+                f"  └ {idx:<12}{(part['label'] or part['partname'] or 'Unknown'):<30}"
+                f"{part['fstype'] or 'Unknown':<10}{part['size']:<10}"
+                f"{'Unknown':<10}{', '.join(m if m else 'None' for m in part['mountpoints'])}\n"
+            )
+    stdscr.refresh()
+
+
+def partition_disk(stdscr: window, device_service: DeviceService, **kwargs):
+    _ = kwargs
+
+    boot_size = 100
+    boot_fs = "fat32"
+    root_fs = "ext4 no journal"
+    selected = 0
+
+    stdscr.clear()
+    stdscr.refresh()
+    device_info = curses_runner(device_service.device_info, stdscr=stdscr)
+    if not device_info:
+        stdscr.addstr("No device found.\n")
+        stdscr.addstr("Press any key to continue...")
+        stdscr.getch()
+        return 1
+
+    while True:
+        print_top(stdscr=stdscr, device_service=device_service)
+        print_partitions(stdscr=stdscr, device_info=device_info)
+
+        menu_items = [
+            f"Boot partition size: {boot_size} MB",
+            f"Boot partition file system: {boot_fs}",
+            f"Root partition size: rest of the disk",
+            f"Root partition file system: {root_fs}",
+            "Partition disk",
+        ]
+        print_menu(stdscr=stdscr, menu_items=menu_items, selected=selected)
+
+        print_key_instructions(stdscr=stdscr)
+
+        key = stdscr.getch()
+        if check_quit_esc(key):
+            return 1
+
+        elif key in (curses.KEY_UP, ord("k")):
+            selected = (selected - 1) % len(menu_items)
+        elif key in (curses.KEY_DOWN, ord("j")):
+            selected = (selected + 1) % len(menu_items)
+
+        elif (key in (10, curses.KEY_ENTER) and selected == 0) or key == ord("1"):
+            ret = text_prompt(stdscr, 7, 22)
+            if ret and ret.isdigit():
+                boot_size = int(ret)
+
+        elif (key in (10, curses.KEY_ENTER) and selected == 4) or key == ord("4"):
+            pass
 
 
 def show_partitions(stdscr, device_service: DeviceService):
@@ -14,8 +87,6 @@ def show_partitions(stdscr, device_service: DeviceService):
     # stdscr.addstr(f"{device_info=}\n")
     if not device_info:
         stdscr.addstr("No device found.\n")
-        # stdscr.addstr(f"{device_service.get_device()=}")
-        # stdscr.addstr(f"{device_info=}")
         stdscr.addstr("Press any key to continue...")
         stdscr.getch()
         return False

@@ -1,0 +1,43 @@
+from curses import A_REVERSE, window
+from disk_ops.device_service import DeviceService
+
+
+def print_key_instructions(stdscr: window):
+    instruction_text = (
+        "Number or Enter to select | ↑↓ or jk to move | esc to return | q to quit"
+    )
+    y = stdscr.getyx()[0]
+    x = stdscr.getmaxyx()[1] // 2 - len(instruction_text) // 2
+    stdscr.addstr(y + 2, x, instruction_text)
+    stdscr.refresh()
+
+
+def print_menu(stdscr: window, menu_items: list, selected: int, y_offset: int = 0):
+    h, w = stdscr.getmaxyx()
+
+    for idx, item in enumerate(menu_items):
+        y = h // 2 - len(menu_items) // 2 + idx + y_offset
+        item = f"{idx + 1}. {item}"
+        x = w // 2 - len(item) // 2
+        if idx == selected:
+            stdscr.attron(A_REVERSE)
+            stdscr.addstr(y, x, item)
+            stdscr.attroff(A_REVERSE)
+        else:
+            stdscr.addstr(y, x, item)
+
+    stdscr.refresh()
+
+
+def print_top(stdscr: window, device_service: DeviceService):
+    """
+    Draws the top box of each screen, with selected device.
+    """
+    device, sector_size, number_of_sectors = device_service.get_device()
+    stdscr.addstr(
+        0,
+        0,
+        f"Device: {device}\nSector size: {sector_size}\nNumber of sectors: {number_of_sectors}",
+    )
+    stdscr.addstr(4, 0, "#" * (stdscr.getmaxyx()[1] - 1) + "\n")
+    stdscr.refresh()
