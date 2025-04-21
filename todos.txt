@@ -1,3 +1,5 @@
 TODO:
 
 - Add checks to see if sudo is even necessary. the sudo runner might be a good place.
+- non-hybrid ISOs should use the 'extract vmlinuz,initrd.gz; boot off of those' trick
+- menu_items should have a "help" entry, ("text", function, "help text"), shown with entry selected and F1/?
