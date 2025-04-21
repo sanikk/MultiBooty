@@ -25,17 +25,6 @@ files = [
 ]
 
 [[package]]
-name = "pyparted"
-version = "3.13.0"
-description = "Python bindings for GNU parted"
-optional = false
-python-versions = "*"
-groups = ["main"]
-files = [
-    {file = "pyparted-3.13.0.tar.gz", hash = "sha256:443b59eb9ac63b8ca87094e02376646e172c7ea075f955f105889ca3485b06fd"},
-]
-
-[[package]]
 name = "pyside6"
 version = "6.8.2.1"
 description = "Python bindings for the Qt cross-platform application and UI framework"
@@ -118,4 +107,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "fedcbaf7267d4a0353fbedfff37c9b88fa6f917c9d1213b9da81c089decd0f3d"
+content-hash = "bf5abc5680dabf28824078a9f5eddfd5ffe3050e3f3c75005d1afcf8268508f3"

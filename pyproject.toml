@@ -12,7 +12,6 @@ invoke = "^2.2.0"
 pyside6 = "^6.8.2.1"
 pycdlib = "^1.14.0"
 pysquashfsimage = "^0.9.0"
-pyparted = "^3.13.0"
 
 
 [build-system]

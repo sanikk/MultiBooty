@@ -1,6 +1,7 @@
 from utils.runners import run_python_subprocess_with_sudo
 import json
-from parted import IOException
+
+# from parted import IOException
 
 
 def propose_partitions(device: str, size_in_mb: int) -> dict:
@@ -26,7 +27,7 @@ def propose_partitions(device: str, size_in_mb: int) -> dict:
                 device_infos = json.loads(ret.stdout)
                 return device_infos
             return {"error": ret.stderr}
-    except IOException:
+    except Exception as e:
         print(f"Invalid device node {device}.")
         return {"error": f"invalid device node {device}"}
     return {"error": "No return value"}
@@ -75,7 +76,7 @@ def make_partitions(
                     f"Wrote boot {boot_start}-{boot_end} and root {root_start}-{root_end} to {device}.",
                 )
             return False, ret.stderr
-    except IOException:
+    except Exception as e:
         return False, f"Invalid device node {device}."
 
     return False, "Something went wrong."
