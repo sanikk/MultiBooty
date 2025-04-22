@@ -1,7 +1,7 @@
-import parted
+# import parted
 import sys
 
-from parted import geometry
+# from parted import geometry
 
 
 def partition_disk(

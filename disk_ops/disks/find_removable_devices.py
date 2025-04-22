@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-def find_removable_devices() -> list[str]:
+def find_removable_devices() -> list[str | None]:
     # [tuple[str, int, int, str]]:
     """
     Collects all devices with the removable flag that are connected.

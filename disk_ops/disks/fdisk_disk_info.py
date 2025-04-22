@@ -32,6 +32,8 @@ def parse_disk_info(disk_info: str) -> tuple:
 
 
 def parse_partition_info(partition_info: str) -> list[tuple | None]:
+    # TODO: ok missing label here, need to add -o +NAME to fdisk
+    # OK THIS DID NOT WORK AT ALL. MADE ANOTHER SOLUTION.
     if not partition_info:
         return []
     returnable = []
@@ -45,20 +47,20 @@ def parse_partition_info(partition_info: str) -> list[tuple | None]:
     return returnable
 
 
-def format_fdisk_output(output: str) -> tuple[tuple, list[tuple | None]] | None:
+def format_fdisk_output(output: str) -> tuple | None:
     try:
         disk_info, partition_info = output.split("\n\n")
 
         # partition_info = partition_info.split()
         parsed_disk_info = parse_disk_info(disk_info)
         parsed_partition_info = parse_partition_info(partition_info)
-        return parsed_disk_info, parsed_partition_info
+        return parsed_disk_info, *parsed_partition_info
     except Exception as e:
         print(e)
         return None
 
 
-def fdisk_read_info(device) -> tuple[tuple, list, list] | None:
+def fdisk_read_info(device) -> tuple[tuple, list] | None:
     """
     Runner for the whole thing.
     Reads and parses fdisk -l output for the given device.
@@ -74,7 +76,7 @@ def fdisk_read_info(device) -> tuple[tuple, list, list] | None:
         if ret and ret.returncode == 0:
             disk_info = format_fdisk_output(ret.stdout)
             if disk_info:
-                return *disk_info, [
+                return disk_info, [
                     line.strip() for line in ret.stderr.split("\n") if line
                 ]
     except Exception as e:
