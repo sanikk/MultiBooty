@@ -1,4 +1,5 @@
 from curses import A_REVERSE, window
+from curses_ui.utils import format_size
 from disk_ops.device_service import DeviceService
 
 
@@ -33,11 +34,23 @@ def print_top(stdscr: window, device_service: DeviceService):
     """
     Draws the top box of each screen, with selected device.
     """
-    device, sector_size, number_of_sectors = device_service.get_device()
-    stdscr.addstr(
-        0,
-        0,
-        f"Device: {device}\nSector size: {sector_size}\nNumber of sectors: {number_of_sectors}",
-    )
+    ret = device_service.get_device()
+    if ret:
+        device, _, size, fstype, label, block_size = ret
+        stdscr.addstr(
+            # f"{device_service.get_device()}"
+            0,
+            0,
+            f"Device: {device:10}\nSize: {format_size(int(size)):10}\nFilesystem: {fstype}\nLabel: {label:10} Block size: {block_size:10}",
+        )
+    else:
+        stdscr.addstr(0, 0, "No device selected.")
     stdscr.addstr(4, 0, "#" * (stdscr.getmaxyx()[1] - 1) + "\n")
     stdscr.refresh()
+
+
+def print_disk_entry(stdscr: window, disk_entry, i: int):
+    for device_node in disk_entry:
+        stdscr.addstr(
+            f"{i + 1 if not device_node[1] else "":3} {device_node[0]:10} {device_node[1]:10} {(int(device_node[1]) + int(device_node[2]) // int(device_node[5])) if device_node[1] else "":10} {int(device_node[2]) // int(device_node[5]):10} {format_size(int(device_node[2])):10}{device_node[3]:10} {device_node[4]:10}\n"
+        )
