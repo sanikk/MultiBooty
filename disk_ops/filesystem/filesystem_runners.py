@@ -1,3 +1,4 @@
+from curses import endwin
 from disk_ops.disks.disk_runners import wait_for_device_node
 from utils.mounting import mounted, partition_unmounted
 from utils.runners import run_python_subprocess_with_sudo, run_subprocess_with_sudo
@@ -10,15 +11,27 @@ def make_fat32_filesystem(partition):
     Make FAT32 filesystem.
     Decorator needs partition.
     """
-    ret = run_subprocess_with_sudo("mkfs.fat", ["-F32", f"{partition}"])
+    ret = run_subprocess_with_sudo("mkfs.fat", ["-F32", "-n", "MULTIBBOOT", partition])
 
-    if ret.returncode == 0:
+    if ret and ret.returncode == 0:
         return True
+    # TODO: add proper error handling
+    endwin()
+    print(ret.stderr)
     return False
 
 
+@partition_unmounted
+@wait_for_device_node
 def make_fat16_filesystem(partition):
-    pass
+    # TODO: ok this can only handle 2gb partitions. maybe add a help entry for that?
+    ret = run_subprocess_with_sudo("mkfs.fat", ["-F16", "-n", "MULTIBBOOT", partition])
+    if ret and ret.returncode == 0:
+        return True
+    # TODO: add proper error handling
+    endwin()
+    print(ret.stderr)
+    return False
 
 
 @partition_unmounted
@@ -28,18 +41,19 @@ def make_ext4_filesystem(partition):
     Make ext4 filesystem with no journaling.
     Decorator needs partition.
     """
-    ret = run_subprocess_with_sudo("mkfs.ext4", ["-O", "^has_journal", f"{partition}"])
+    ret = run_subprocess_with_sudo(
+        "mkfs.ext4", ["-O", "^has_journal", "-L", "MultiBootyRoot", partition]
+    )
     if ret.returncode == 0:
         return True
     return False
 
 
-def make_ext3_filesystem(partition):
-    pass
-
-
 def make_ext2_filesystem(partition):
-    pass
+    ret = run_subprocess_with_sudo("mkfs.ext2", ["-L", "MultiBootyRoot", partition])
+    if ret.returncode == 0:
+        return True
+    return False
 
 
 @partition_unmounted

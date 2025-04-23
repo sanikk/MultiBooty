@@ -1,21 +1,12 @@
 from disk_ops.disks.find_removable_devices import find_removable_devices
 
-# from disk_ops.partitions.partition_runners import propose_partitions, make_partitions
 from disk_ops.disks.lsblk_tools import disk_info
 from disk_ops.filesystem.filesystem_runners import (
     make_ext4_filesystem,
-    make_ext3_filesystem,
     make_ext2_filesystem,
     make_fat32_filesystem,
     make_fat16_filesystem,
 )
-
-# from disk_ops.filesystem.filesystem_runners import (
-#     make_fat32_filesystem,
-#     make_ext4_filesystem,
-#     read_partition_uuid,
-#     make_root_folders,
-# )
 
 
 class DeviceService:
@@ -26,8 +17,7 @@ class DeviceService:
     ]
 
     _root_fs_types = [
-        ("ext4", make_ext4_filesystem),
-        ("ext3", make_ext3_filesystem),
+        ("ext4 no journal", make_ext4_filesystem),
         ("ext2", make_ext2_filesystem),
     ]
 
