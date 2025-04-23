@@ -93,12 +93,12 @@ def selection_box(
         if key in (10, KEY_ENTER):
             endwin()
             print(choices[selected])
-            callback(choices[selected])
+            callback(selected)
             close_window(box_win)
             return
         elif ord("0") < key < ord(str(len(choices) + 1)):
             endwin()
             print(choices[key - ord("1")])
-            callback(choices[key - ord("1")])
+            callback(key - ord("1"))
             close_window(box_win)
             return

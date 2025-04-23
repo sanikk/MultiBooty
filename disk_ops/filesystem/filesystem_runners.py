@@ -17,6 +17,10 @@ def make_fat32_filesystem(partition):
     return False
 
 
+def make_fat16_filesystem(partition):
+    pass
+
+
 @partition_unmounted
 @wait_for_device_node
 def make_ext4_filesystem(partition):
@@ -28,6 +32,14 @@ def make_ext4_filesystem(partition):
     if ret.returncode == 0:
         return True
     return False
+
+
+def make_ext3_filesystem(partition):
+    pass
+
+
+def make_ext2_filesystem(partition):
+    pass
 
 
 @partition_unmounted

@@ -90,7 +90,7 @@ def partition_disk(stdscr: window, device_service: DeviceService, **kwargs):
             selection_box(
                 stdscr=stdscr,
                 message=["Please select a file system", "for the boot partition."],
-                choices=["fat32", "fat16"],
+                choices=device_service.get_boot_fs_types(),
                 callback=device_service.set_boot_fs,
                 default_index=0,
             )
@@ -101,7 +101,7 @@ def partition_disk(stdscr: window, device_service: DeviceService, **kwargs):
             selection_box(
                 stdscr=stdscr,
                 message=["Please select a file system", "for the root partition."],
-                choices=["ext4", "ext3", "ext2"],
+                choices=device_service.get_root_fs_types(),
                 callback=device_service.set_root_fs,
                 default_index=0,
             )

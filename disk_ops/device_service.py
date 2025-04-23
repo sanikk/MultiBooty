@@ -2,6 +2,13 @@ from disk_ops.disks.find_removable_devices import find_removable_devices
 
 # from disk_ops.partitions.partition_runners import propose_partitions, make_partitions
 from disk_ops.disks.lsblk_tools import disk_info
+from disk_ops.filesystem.filesystem_runners import (
+    make_ext4_filesystem,
+    make_ext3_filesystem,
+    make_ext2_filesystem,
+    make_fat32_filesystem,
+    make_fat16_filesystem,
+)
 
 # from disk_ops.filesystem.filesystem_runners import (
 #     make_fat32_filesystem,
@@ -13,14 +20,25 @@ from disk_ops.disks.lsblk_tools import disk_info
 
 class DeviceService:
 
+    _boot_fs_types = [
+        ("fat32", make_fat32_filesystem),
+        ("fat16", make_fat16_filesystem),
+    ]
+
+    _root_fs_types = [
+        ("ext4", make_ext4_filesystem),
+        ("ext3", make_ext3_filesystem),
+        ("ext2", make_ext2_filesystem),
+    ]
+
     def __init__(self, device: tuple | None = None):
         self._device = device
         self._all_devices = None
 
         self._suggested_partititions = None
-        self._boot_fs = "fat32"
+        self._boot_fs = 0
         self._boot_uuid = None
-        self._root_fs = "ext4"
+        self._root_fs = 0
         self._root_uuid = None
 
         self._mountpoint = None
@@ -72,17 +90,29 @@ class DeviceService:
         if self._device:
             self._device = disk_info(self._device[0][0])
 
-    def get_root_fs(self):
-        return self._root_fs
+    def get_root_fs(self) -> str:
+        return self._root_fs_types[self._root_fs][0]
 
-    def set_root_fs(self, root_fs: str):
-        self._root_fs = root_fs
+    def get_root_fs_types(self):
+        return [a[0] for a in self._root_fs_types]
 
-    def get_boot_fs(self):
-        return self._boot_fs
+    def set_root_fs(self, index: int):
+        if 0 <= index < len(self._root_fs_types):
+            self._root_fs = index
 
-    def set_boot_fs(self, boot_fs: str):
-        self._boot_fs = boot_fs
+    def get_boot_fs(self) -> str:
+        return self._boot_fs_types[self._boot_fs][0]
+
+    def get_boot_fs_types(self):
+        return [a[0] for a in self._boot_fs_types]
+
+    def set_boot_fs(self, index: int):
+        if 0 <= index < len(self._boot_fs_types):
+            self._boot_fs = index
+
+
+#    def set_boot_fs(self, boot_fs: str):
+#        self._boot_fs = boot_fs
 
 
 #     def suggest_partitions(self, boot_size_mb):
