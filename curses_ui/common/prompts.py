@@ -1,4 +1,3 @@
-# import curses
 from typing import Callable
 from curses import KEY_ENTER, endwin, window, echo, noecho, KEY_BACKSPACE, newwin
 

@@ -1,9 +1,4 @@
-import curses
-
-# import sys
-from curses import window
-
-# from curses_ui.common.curses_runner import curses_runner
+from curses import KEY_ENTER, window
 from curses_ui.common.controls import change_selection, check_quit_esc
 from curses_ui.common.prints import (
     print_disk_entry,
@@ -11,43 +6,14 @@ from curses_ui.common.prints import (
     print_menu,
     print_top,
 )
-from curses_ui.common.prompts import selection_box
-from curses_ui.prompts import text_prompt
-
-# from curses_ui.utils import check_quit_esc, print_key_instructions
-
+from curses_ui.common.prompts import selection_box, text_prompt
 from disk_ops.device_service import DeviceService
-
-# from grub.grub_service import GrubService
-
-
-# def print_partitions(stdscr: window, device_info: dict):
-#     stdscr.addstr(
-#         f"{'Identifier':<15}{'Name':<32}{'FS':<12}{'Size':<10}{'Mount Points'}\n"
-#     )
-#     stdscr.addstr("-" * 80 + "\n")
-#
-#     stdscr.addstr(
-#         f"/dev/{device_info['name']:<14}{(device_info['vendor'] or '') + ' ' + (device_info['model'] or ''):<30}"
-#         f"{device_info['fstype'] or 'Unknown':<10}{device_info['size']:<10}"
-#         f"{'Unknown':<10}{', '.join(m if m else 'None' for m in device_info['mountpoints'])}\n"
-#     )
-#     if "children" in device_info and device_info["children"]:
-#         for idx, part in enumerate(device_info["children"]):
-#             stdscr.addstr(
-#                 f"  └ {idx:<12}{(part['label'] or part['partname'] or 'Unknown'):<30}"
-#                 f"{part['fstype'] or 'Unknown':<10}{part['size']:<10}"
-#                 f"{'Unknown':<10}{', '.join(m if m else 'None' for m in part['mountpoints'])}\n"
-#             )
-#     stdscr.refresh()
 
 
 def partition_disk(stdscr: window, device_service: DeviceService, **kwargs):
     _ = kwargs
 
     boot_size = 100
-    # boot_fs = "fat32"
-    # root_fs = "ext4 no journal"
     selected = 0
     stdscr.clear()
     stdscr.refresh()
@@ -56,10 +22,13 @@ def partition_disk(stdscr: window, device_service: DeviceService, **kwargs):
     if not device_info:
         stdscr.addstr("No device found.\n")
         stdscr.addstr("Press any key to continue...")
+        stdscr.refresh()
         stdscr.getch()
         return 1
 
     while True:
+        stdscr.clear()
+        stdscr.refresh()
         print_top(stdscr=stdscr, device_service=device_service)
         print_disk_entry(stdscr=stdscr, disk_entry=device_info)
 
@@ -78,14 +47,14 @@ def partition_disk(stdscr: window, device_service: DeviceService, **kwargs):
         if check_quit_esc(key):
             return 1
         selected = change_selection(key=key, selected=selected, menu_items=menu_items)
-        if (key in (10, curses.KEY_ENTER) and selected == 0) or key == ord("1"):
+        if (key in (10, KEY_ENTER) and selected == 0) or key == ord("1"):
             y, x = stdscr.getmaxyx()
             y = y // 2 - len(menu_items) // 2
             x = x // 2 + 10
             ret = text_prompt(stdscr, y, x)
             if ret and ret.isdigit():
                 boot_size = int(ret)
-        elif (key in (10, curses.KEY_ENTER) and selected == 1) or key == ord("2"):
+        elif (key in (10, KEY_ENTER) and selected == 1) or key == ord("2"):
 
             selection_box(
                 stdscr=stdscr,
@@ -94,9 +63,8 @@ def partition_disk(stdscr: window, device_service: DeviceService, **kwargs):
                 callback=device_service.set_boot_fs,
                 default_index=0,
             )
-            # continue
 
-        elif (key in (10, curses.KEY_ENTER) and selected == 3) or key == ord("4"):
+        elif (key in (10, KEY_ENTER) and selected == 3) or key == ord("4"):
 
             selection_box(
                 stdscr=stdscr,
@@ -105,7 +73,6 @@ def partition_disk(stdscr: window, device_service: DeviceService, **kwargs):
                 callback=device_service.set_root_fs,
                 default_index=0,
             )
-            # continue
 
 
 # def show_partitions(stdscr, device_service: DeviceService):

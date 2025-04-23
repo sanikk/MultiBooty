@@ -1,7 +1,7 @@
 import curses
 from pathlib import Path
 from sys import exit
-from curses_ui.prompts import text_prompt, selection_box
+from curses_ui.common.prompts import text_prompt, selection_box
 from curses_ui.utils import print_key_instructions
 
 
