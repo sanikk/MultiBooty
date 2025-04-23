@@ -3,21 +3,26 @@ from curses_ui.utils import format_size
 from disk_ops.device_service import DeviceService
 
 
-def print_key_instructions(stdscr: window):
+def print_key_instructions(stdscr: window, y_offset=0):
     instruction_text = (
         "Number or Enter to select | ↑↓ or jk to move | esc to return | q to quit"
     )
-    y = stdscr.getyx()[0]
-    x = stdscr.getmaxyx()[1] // 2 - len(instruction_text) // 2
-    stdscr.addstr(y + 2, x, instruction_text)
+    y, x = stdscr.getmaxyx()
+    y = y // 2 + y_offset
+    x = x // 2 - len(instruction_text) // 2
+    stdscr.addstr(y, x, instruction_text)
     stdscr.refresh()
 
 
-def print_menu(stdscr: window, menu_items: list, selected: int, y_offset: int = 0):
+def print_menu(
+    stdscr: window, menu_items: list, selected: int, y_offset: int = 0, start_y=None
+):
     h, w = stdscr.getmaxyx()
+    if not start_y:
+        start_y = h // 2 - len(menu_items) // 2 + y_offset
 
     for idx, item in enumerate(menu_items):
-        y = h // 2 - len(menu_items) // 2 + idx + y_offset
+        y = start_y + idx
         item = f"{idx + 1}. {item}"
         x = w // 2 - len(item) // 2
         if idx == selected:
@@ -36,9 +41,8 @@ def print_top(stdscr: window, device_service: DeviceService):
     """
     ret = device_service.get_device()
     if ret:
-        device, _, size, fstype, label, block_size = ret
+        device, _, size, fstype, label, block_size = ret[0]
         stdscr.addstr(
-            # f"{device_service.get_device()}"
             0,
             0,
             f"Device: {device:10}\nSize: {format_size(int(size)):10}\nFilesystem: {fstype}\nLabel: {label:10} Block size: {block_size:10}",
@@ -49,8 +53,8 @@ def print_top(stdscr: window, device_service: DeviceService):
     stdscr.refresh()
 
 
-def print_disk_entry(stdscr: window, disk_entry, i: int):
+def print_disk_entry(stdscr: window, disk_entry, i=None):
     for device_node in disk_entry:
         stdscr.addstr(
-            f"{i + 1 if not device_node[1] else "":3} {device_node[0]:10} {device_node[1]:10} {(int(device_node[1]) + int(device_node[2]) // int(device_node[5])) if device_node[1] else "":10} {int(device_node[2]) // int(device_node[5]):10} {format_size(int(device_node[2])):10}{device_node[3]:10} {device_node[4]:10}\n"
+            f"{i + 1 if i is not None and device_node[1] == '' else "":3} {device_node[0]:10} {device_node[1]:10} {(int(device_node[1]) + int(device_node[2]) // int(device_node[5])) if device_node[1] else "":10} {int(device_node[2]) // int(device_node[5]):10} {format_size(int(device_node[2])):10}{device_node[3]:10} {device_node[4]:10}\n"
         )

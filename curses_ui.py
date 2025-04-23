@@ -36,7 +36,7 @@ def main_menu(stdscr: window, device_service: DeviceService, grub_service: GrubS
 
         print_menu(stdscr=stdscr, menu_items=menu_texts, selected=selected)
 
-        print_key_instructions(stdscr=stdscr)
+        print_key_instructions(stdscr=stdscr, y_offset=len(menu_items) // 2 + 2)
 
         stdscr.refresh()
 

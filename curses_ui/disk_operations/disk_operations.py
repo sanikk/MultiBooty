@@ -21,7 +21,7 @@ def disk_operations(stdscr: window, device_service: DeviceService, **_):
 
         print_menu(stdscr=stdscr, menu_items=menu_items, selected=selected)
 
-        print_key_instructions(stdscr=stdscr)
+        print_key_instructions(stdscr=stdscr, y_offset=len(menu_items) // 2 + 2)
 
         key = stdscr.getch()
 

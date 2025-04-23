@@ -25,7 +25,7 @@ class DeviceService:
 
         self._mountpoint = None
 
-    def get_device(self) -> tuple[str, str, str, str, str, str] | None:
+    def get_device(self):
         if self._device:
             return self._device
         return None
@@ -41,6 +41,7 @@ class DeviceService:
     def set_device(self, selection: int):
         if self._all_devices and 0 <= selection < len(self._all_devices):
             self._device = self._all_devices[selection]
+            self._all_devices = None
 
     def get_mountpoint(self) -> str | None:
         return self._mountpoint
@@ -63,8 +64,25 @@ class DeviceService:
         """
         devices = find_removable_devices()
         ret = [tuple(disk_info(device)) for device in devices if device]
-        self._all_devices = [device[0] for device in ret]
+        self._all_devices = ret
+        # self._all_devices = [device[0] for device in ret]
         return ret
+
+    def refresh_device(self):
+        if self._device:
+            self._device = disk_info(self._device[0][0])
+
+    def get_root_fs(self):
+        return self._root_fs
+
+    def set_root_fs(self, root_fs: str):
+        self._root_fs = root_fs
+
+    def get_boot_fs(self):
+        return self._boot_fs
+
+    def set_boot_fs(self, boot_fs: str):
+        self._boot_fs = boot_fs
 
 
 #     def suggest_partitions(self, boot_size_mb):
