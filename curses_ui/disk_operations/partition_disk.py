@@ -73,6 +73,8 @@ def partition_disk(stdscr: window, device_service: DeviceService, **kwargs):
                 callback=device_service.set_root_fs,
                 default_index=0,
             )
+        elif (key in (10, KEY_ENTER) and selected == 4) or key == ord("5"):
+            device_service.partition_disk()
 
 
 # def show_partitions(stdscr, device_service: DeviceService):

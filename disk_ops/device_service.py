@@ -100,6 +100,9 @@ class DeviceService:
         if 0 <= index < len(self._boot_fs_types):
             self._boot_fs = index
 
+    def partition_disk(self):
+        pass
+
 
 #    def set_boot_fs(self, boot_fs: str):
 #        self._boot_fs = boot_fs
