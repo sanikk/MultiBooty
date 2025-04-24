@@ -28,7 +28,7 @@ def select_device(stdscr: window, device_service: DeviceService, **kwargs):
             for i, disk_entry in enumerate(disk_info):
                 print_disk_entry(stdscr=stdscr, disk_entry=disk_entry, i=i)
 
-        print_key_instructions(stdscr=stdscr)
+        print_key_instructions(stdscr=stdscr, updown=False)
 
         char = stdscr.getch()
 

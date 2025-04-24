@@ -3,14 +3,15 @@ from curses_ui.utils import format_size
 from disk_ops.device_service import DeviceService
 
 
-def print_key_instructions(stdscr: window, y_offset=0):
-    instruction_text = (
-        "Number or Enter to select | ↑↓ or jk to move | esc to return | q to quit"
-    )
-    y, x = stdscr.getmaxyx()
-    y = y // 2 + y_offset
+def print_key_instructions(
+    stdscr: window, y_offset=0, y_start=None, numbers=True, updown=True
+):
+    instruction_text = f"{"Number" if numbers else ""}{" or " if numbers and updown else ""}{"Enter" if updown else ""} to select {"| ↑↓ or jk to move " if updown else ""}| esc to return | q to quit"
+    max_y, x = stdscr.getmaxyx()
+    if not y_start:
+        y_start = max_y // 2 + y_offset
     x = x // 2 - len(instruction_text) // 2
-    stdscr.addstr(y, x, instruction_text)
+    stdscr.addstr(y_start, x, instruction_text)
     stdscr.refresh()
 
 
