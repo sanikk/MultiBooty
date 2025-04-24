@@ -2,7 +2,7 @@ import curses
 from pathlib import Path
 from sys import exit
 from curses_ui.common.prompts import text_prompt, selection_box
-from curses_ui.utils import print_key_instructions
+from curses_ui.common.prints import print_key_instructions
 
 
 def install_grub_screen(stdscr, grub_service, **kwargs) -> int:
