@@ -1,31 +1,39 @@
 from disk_ops.disks.find_removable_devices import find_removable_devices
 
-# from disk_ops.partitions.partition_runners import propose_partitions, make_partitions
 from disk_ops.disks.lsblk_tools import disk_info
-
-# from disk_ops.filesystem.filesystem_runners import (
-#     make_fat32_filesystem,
-#     make_ext4_filesystem,
-#     read_partition_uuid,
-#     make_root_folders,
-# )
+from disk_ops.filesystem.filesystem_runners import (
+    make_ext4_filesystem,
+    make_ext2_filesystem,
+    make_fat32_filesystem,
+    make_fat16_filesystem,
+)
 
 
 class DeviceService:
+
+    _boot_fs_types = [
+        ("fat32", make_fat32_filesystem),
+        ("fat16", make_fat16_filesystem),
+    ]
+
+    _root_fs_types = [
+        ("ext4 no journal", make_ext4_filesystem),
+        ("ext2", make_ext2_filesystem),
+    ]
 
     def __init__(self, device: tuple | None = None):
         self._device = device
         self._all_devices = None
 
         self._suggested_partititions = None
-        self._boot_fs = "fat32"
+        self._boot_fs = 0
         self._boot_uuid = None
-        self._root_fs = "ext4"
+        self._root_fs = 0
         self._root_uuid = None
 
         self._mountpoint = None
 
-    def get_device(self) -> tuple[str, str, str, str, str, str] | None:
+    def get_device(self):
         if self._device:
             return self._device
         return None
@@ -41,6 +49,7 @@ class DeviceService:
     def set_device(self, selection: int):
         if self._all_devices and 0 <= selection < len(self._all_devices):
             self._device = self._all_devices[selection]
+            self._all_devices = None
 
     def get_mountpoint(self) -> str | None:
         return self._mountpoint
@@ -63,8 +72,40 @@ class DeviceService:
         """
         devices = find_removable_devices()
         ret = [tuple(disk_info(device)) for device in devices if device]
-        self._all_devices = [device[0] for device in ret]
+        self._all_devices = ret
+        # self._all_devices = [device[0] for device in ret]
         return ret
+
+    def refresh_device(self):
+        if self._device:
+            self._device = disk_info(self._device[0][0])
+
+    def get_root_fs(self) -> str:
+        return self._root_fs_types[self._root_fs][0]
+
+    def get_root_fs_types(self):
+        return [a[0] for a in self._root_fs_types]
+
+    def set_root_fs(self, index: int):
+        if 0 <= index < len(self._root_fs_types):
+            self._root_fs = index
+
+    def get_boot_fs(self) -> str:
+        return self._boot_fs_types[self._boot_fs][0]
+
+    def get_boot_fs_types(self):
+        return [a[0] for a in self._boot_fs_types]
+
+    def set_boot_fs(self, index: int):
+        if 0 <= index < len(self._boot_fs_types):
+            self._boot_fs = index
+
+    def partition_disk(self):
+        pass
+
+
+#    def set_boot_fs(self, boot_fs: str):
+#        self._boot_fs = boot_fs
 
 
 #     def suggest_partitions(self, boot_size_mb):
