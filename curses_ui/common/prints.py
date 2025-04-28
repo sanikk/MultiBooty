@@ -1,7 +1,7 @@
 from curses import A_REVERSE, window
 from curses_ui.utils import format_size
 from disk_ops.device_service import DeviceService
-
+from curses_ui.common.formatting import add_reverse
 
 def print_key_instructions(
     stdscr: window, y_offset=0, y_start=None, numbers=True, updown=True
@@ -59,3 +59,15 @@ def print_disk_entry(stdscr: window, disk_entry, i=None):
         stdscr.addstr(
             f"{i + 1 if i is not None and device_node[1] == '' else "":3} {device_node[0]:10} {device_node[1]:10} {(int(device_node[1]) + int(device_node[2]) // int(device_node[5])) if device_node[1] else "":10} {int(device_node[2]) // int(device_node[5]):10} {format_size(int(device_node[2])):10}{device_node[3]:10} {device_node[4]:10}\n"
         )
+
+def print_file_list(win: window, lst: list, showing: int, selected: int, y_offset=0, x_offset=0):
+    max_width = win.getmaxyx()[1] - 2
+    linenumber = y_offset
+    beginning = max(0, min(selected - showing // 2, len(lst) - showing))
+    for idx, file_entry in lst[beginning : beginning + showing]:
+        if idx == selected:
+            add_reverse(win, linenumber, x_offset, f"{str(file_entry)[:max_width]}")
+
+        else:
+            win.addstr(linenumber, x_offset, f"{str(file_entry)[:max_width]}")
+        linenumber += 1

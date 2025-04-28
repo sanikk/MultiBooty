@@ -1,6 +1,7 @@
 from curses import window, KEY_ENTER
 
-from curses_ui.common.filereader import fileviewer, picker_windows
+from curses_ui.common.filereader import fileviewer 
+from curses_ui.common.filepicker import picker_windows
 from curses_ui.common.prints import print_key_instructions, print_menu, print_top
 from curses_ui.common.controls import check_quit_esc, change_selection
 from disk_ops.device_service import DeviceService
@@ -10,6 +11,7 @@ from grub.grub_service import GrubService
 def iso_bootloader_management(
     stdscr: window, device_service: DeviceService, grub_service: GrubService
 ):
+    _ = grub_service
     menu_items = [
         "file viewer",
         "picker windows",
