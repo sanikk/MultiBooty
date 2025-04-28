@@ -1,7 +1,7 @@
 from curses import window
 from curses_ui.common.prints import print_disk_entry, print_key_instructions, print_top
 from disk_ops.device_service import DeviceService
-from curses_ui.utils import check_quit_esc
+from curses_ui.common.controls import check_quit_esc
 
 
 def select_device(stdscr: window, device_service: DeviceService, **kwargs):
@@ -28,11 +28,11 @@ def select_device(stdscr: window, device_service: DeviceService, **kwargs):
             for i, disk_entry in enumerate(disk_info):
                 print_disk_entry(stdscr=stdscr, disk_entry=disk_entry, i=i)
 
-        print_key_instructions(stdscr=stdscr)
+        print_key_instructions(stdscr=stdscr, updown=False)
 
         char = stdscr.getch()
 
-        if not check_quit_esc(char):
+        if check_quit_esc(char):
             return 0
         try:
             as_number = char - ord("0")

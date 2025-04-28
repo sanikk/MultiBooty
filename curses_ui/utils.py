@@ -26,16 +26,3 @@ def handle_return_value(stdscr, ret):
 def print_lines(stdscr, lines):
     for line in lines:
         stdscr.addstr(line + "\n")
-
-
-def check_quit_esc(char):
-    if char == 27:
-        return False
-    if char == ord("q") or char == ord("Q"):
-        exit(0)
-    return True
-
-
-def print_key_instructions(stdscr):
-    stdscr.addstr(6, 0, "↑↓ or jk to move | Enter to select | q to quit")
-    stdscr.refresh()
