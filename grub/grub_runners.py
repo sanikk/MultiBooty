@@ -1,5 +1,6 @@
-from utils.runners import run_subprocess_with_sudo
+from utils.runners import run_subprocess_with_sudo, run_python_subprocess_with_sudo
 from utils.mounting import mounted
+
 
 architectures = {
     "amd64": "x86_64-efi",
@@ -9,8 +10,7 @@ architectures = {
 
 
 @mounted
-# def make_grub(partition: str, mountpoint: str, x64: bool = True):
-def make_grub(partition: str, mountpoint: str, architecture: str):
+def make_grub(partition: str, mountpoint: str, architecture: str) -> bool:
     """
     Does grub-install on a given partition.
 
@@ -27,23 +27,26 @@ def make_grub(partition: str, mountpoint: str, architecture: str):
         or not architecture
         or architecture not in architectures
     ):
-        return
+        return False
     try:
         ret = run_subprocess_with_sudo(
             "grub-install",
             [
-                # "--removable",
-                # "--target=x86_64-efi",
+                "--removable",
+                "--no-nvram",
                 f"--target={architectures[architecture]}",
                 f"--efi-directory={mountpoint}",
                 "--bootloader-id=GRUB",
                 f"--boot-directory={mountpoint}/boot",
             ],
         )
-        # umount = umount_partition(dev, 1)
-        return ret
         if ret:
-            return ret.returncode == 1
+            return ret.returncode == 0
     except Exception as e:
         print(f"Error running grub-install: {e}")
     return False
+
+
+def read_grub_file(device):
+    ret = run_python_subprocess_with_sudo("grub/grub_reader.py", [f"{device}1"])
+    return ret
