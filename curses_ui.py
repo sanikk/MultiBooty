@@ -1,3 +1,6 @@
+from curses_ui.iso_bootloader_management.iso_bootloader_management import (
+    iso_bootloader_management,
+)
 from curses_ui.select_device.select_device import select_device
 from curses_ui.disk_operations.disk_operations import disk_operations
 
@@ -19,8 +22,8 @@ def fake_func():
 menu_items = [
     ("Select Target Device", select_device),
     ("Disk Operations", disk_operations),
-    ("Install / Manage MultiBooty", install_grub_screen),
-    ("ISO & Bootloader Setup", fake_func),
+    ("Manage MultiBooty", install_grub_screen),
+    ("ISO & Bootloader Setup", iso_bootloader_management),
     ("Package Cache Management", fake_func),
 ]
 
@@ -36,7 +39,7 @@ def main_menu(stdscr: window, device_service: DeviceService, grub_service: GrubS
 
         print_menu(stdscr=stdscr, menu_items=menu_texts, selected=selected)
 
-        print_key_instructions(stdscr=stdscr)
+        print_key_instructions(stdscr=stdscr, y_offset=len(menu_items) // 2 + 2)
 
         stdscr.refresh()
 

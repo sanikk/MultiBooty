@@ -1,16 +1,22 @@
 from curses import window, KEY_ENTER
-from curses_ui.common.controls import change_selection
-from curses_ui.common.prints import print_key_instructions, print_top, print_menu
-from curses_ui.common.controls import check_quit_esc
-from curses_ui.disk_operations.partition_disk import partition_disk
+
+from curses_ui.common.filereader import fileviewer 
+from curses_ui.common.filepicker import picker_windows
+from curses_ui.common.prints import print_key_instructions, print_menu, print_top
+from curses_ui.common.controls import check_quit_esc, change_selection
 from disk_ops.device_service import DeviceService
+from grub.grub_service import GrubService
 
 
-def disk_operations(stdscr: window, device_service: DeviceService, **_):
+def iso_bootloader_management(
+    stdscr: window, device_service: DeviceService, grub_service: GrubService
+):
+    _ = grub_service
     menu_items = [
-        "Partition disk",
-        "Install grub",
-        "Make folders on root",
+        "file viewer",
+        "picker windows",
+        # "Install grub",
+        # "Make folders on root",
     ]
     selected = 0
     while True:
@@ -29,9 +35,9 @@ def disk_operations(stdscr: window, device_service: DeviceService, **_):
             return 0
         selected = change_selection(key=key, selected=selected, menu_items=menu_items)
         if (key in [KEY_ENTER, 10, 13] and selected == 0) or key == ord("1"):
-            partition_disk(stdscr=stdscr, device_service=device_service)
+            fileviewer(stdscr=stdscr, path="/home/karpo/", mask="*.*")
         if (key in [KEY_ENTER, 10, 13] and selected == 1) or key == ord("2"):
-            # TODO: implement this
+            picker_windows(stdscr=stdscr)
             pass
         if (key in [KEY_ENTER, 10, 13] and selected == 2) or key == ord("3"):
             # TODO: implement this

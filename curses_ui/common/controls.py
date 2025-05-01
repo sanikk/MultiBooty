@@ -11,7 +11,7 @@ def check_quit_esc(key):
 
 def change_selection(key, selected, menu_items):
     if key in [KEY_UP, ord("k")]:
-        selected = (selected - 1) % len(menu_items)
+        selected = (selected - 1) % (len(menu_items) or 1)
     elif key in [KEY_DOWN, ord("j")]:
-        selected = (selected + 1) % len(menu_items)
+        selected = (selected + 1) % (len(menu_items) or 1)
     return selected
