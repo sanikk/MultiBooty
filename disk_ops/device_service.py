@@ -7,48 +7,89 @@ from disk_ops.filesystem.filesystem_runners import (
     make_fat32_filesystem,
     make_fat16_filesystem,
 )
+from disk_ops.partitions.sgdisk_ops import (
+    make_new_gpt,
+    make_next_partition,
+    make_protective_mbr,
+    print_partitions,
+    verify_gpt,
+)
 
 
 class DeviceService:
 
-    _boot_fs_types = [
+    _fat_fs_types = [
         ("fat32", make_fat32_filesystem),
         ("fat16", make_fat16_filesystem),
     ]
 
-    _root_fs_types = [
+    _linux_fs_types = [
         ("ext4 no journal", make_ext4_filesystem),
         ("ext2", make_ext2_filesystem),
     ]
 
     def __init__(self, device: tuple | None = None):
+
         self._device = device
         self._all_devices = None
+        self._device_info = None
 
         self._suggested_partititions = None
-        self._boot_fs = 0
-        self._boot_uuid = None
+
+        self._boot_partition_size = 100
+        self._boot_partition_fs = 0
+        self._boot_partition_uuid = None
+
+        self._package_partition = True
+        self._package_partition_size = 2048
+        self._package_partition_fs = 0
+        self._package_partition_uuid = None
+
         self._root_fs = 0
         self._root_uuid = None
 
-        self._mountpoint = None
+        self._protective_mbr = True
+
+        self._mountpoint = "/mnt"
+
+    def partition_disk(self):
+        # if self._boot_partition_fs and self._boot_partition_size:
+        #     print(0)
+        # else:
+        #     print("0 failed")
+        #     print(f"{self._boot_partition_fs=}")
+        #     print(f"{self._boot_partition_size=}")
+        #     return False
+        if not make_new_gpt(self._device):
+            return False
+        if not make_next_partition(self._device, self._boot_partition_size):
+            return False
+        if self._package_partition and not make_next_partition(
+            self._device, self._package_partition_size
+        ):
+            return False
+
+        if not make_next_partition(self._device):
+            return False
+        if self._protective_mbr and not make_protective_mbr(
+            self._device, self._package_partition
+        ):
+            return False
+        if not verify_gpt(device=self._device):
+            return False
+        return True
+
+    # Device Functions
 
     def get_device(self):
         if self._device:
             return self._device
         return None
 
-    #     def get_boot_uuid(self) -> str | None:
-    #         if self._boot_uuid:
-    #             return self._boot_uuid
-    #
-    #     def get_root_uuid(self) -> str | None:
-    #         if self._root_uuid:
-    #             return self._root_uuid
-
     def set_device(self, selection: int):
         if self._all_devices and 0 <= selection < len(self._all_devices):
-            self._device = self._all_devices[selection]
+            self._device_info = self._all_devices[selection]
+            self._device = self._device_info[0][0]
             self._all_devices = None
 
     def get_mountpoint(self) -> str | None:
@@ -56,13 +97,6 @@ class DeviceService:
 
     def set_mountpoint(self, mountpoint: str):
         self._mountpoint = mountpoint
-
-    #     def device_info(self) -> None | tuple[tuple, list]:
-    #         if not self._device:
-    #             return None
-    #         # disk_info = gather_block_info(self._device)
-    #         disk_info = fdisk_read_info(self._device)
-    #         return disk_info
 
     def list_devices(self):
         """
@@ -73,35 +107,75 @@ class DeviceService:
         devices = find_removable_devices()
         ret = [tuple(disk_info(device)) for device in devices if device]
         self._all_devices = ret
-        # self._all_devices = [device[0] for device in ret]
         return ret
 
-    def refresh_device(self):
-        if self._device:
-            self._device = disk_info(self._device[0][0])
+    # Partition functions
 
     def get_root_fs(self) -> str:
-        return self._root_fs_types[self._root_fs][0]
+        return self._linux_fs_types[self._root_fs][0]
 
-    def get_root_fs_types(self):
-        return [a[0] for a in self._root_fs_types]
+    def get_linux_fs_types(self):
+        return [a[0] for a in self._linux_fs_types]
 
     def set_root_fs(self, index: int):
-        if 0 <= index < len(self._root_fs_types):
+        if 0 <= index < len(self._linux_fs_types):
             self._root_fs = index
 
     def get_boot_fs(self) -> str:
-        return self._boot_fs_types[self._boot_fs][0]
+        return self._fat_fs_types[self._boot_fs][0]
 
-    def get_boot_fs_types(self):
-        return [a[0] for a in self._boot_fs_types]
+    def get_fat_fs_types(self):
+        return [a[0] for a in self._fat_fs_types]
 
     def set_boot_fs(self, index: int):
-        if 0 <= index < len(self._boot_fs_types):
+        if 0 <= index < len(self._fat_fs_types):
             self._boot_fs = index
 
-    def partition_disk(self):
-        pass
+    def get_package_partition(self):
+        return self._package_partition
+
+    def set_package_partition(self, val):
+        if val in (True, False):
+            self._package_partition = val
+
+    def get_package_partition_fs(self):
+        return self._package_partition_fs
+
+    def set_package_partition_fs(self, index: int):
+        if 0 <= index < len(self._linux_fs_types):
+            self._package_partition_fs = index
+
+    def get_package_partition_size(self):
+        return self._package_partition_size
+
+    def set_package_partition_size(self, size: int):
+        if size > 0:
+            self._package_partition_size = size
+
+    def get_package_partition_info(self):
+        if self._package_partition:
+            return f"File system: {self._linux_fs_types[self._package_partition_fs]}, Size: {self._package_partition_size}"
+        return f"{self._package_partition}"
+
+    def get_protective_mbr(self):
+        return self._protective_mbr
+
+    def set_protective_mbr(self, val: bool):
+        self._protective_mbr = val
+
+    #     def device_info(self) -> None | tuple[tuple, list]:
+    #         if not self._device:
+    #             return None
+    #         # disk_info = gather_block_info(self._device)
+    #         disk_info = fdisk_read_info(self._device)
+    #         return disk_info
+    #     def get_boot_uuid(self) -> str | None:
+    #         if self._boot_uuid:
+    #             return self._boot_uuid
+    #
+    #     def get_root_uuid(self) -> str | None:
+    #         if self._root_uuid:
+    #             return self._root_uuid
 
 
 #    def set_boot_fs(self, boot_fs: str):

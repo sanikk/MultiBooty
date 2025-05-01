@@ -1,4 +1,4 @@
-from curses import KEY_ENTER, window
+from curses import KEY_ENTER, newwin, window
 from curses_ui.common.controls import change_selection, check_quit_esc
 from curses_ui.common.prints import (
     print_disk_entry,
@@ -10,10 +10,50 @@ from curses_ui.common.prompts import selection_box, text_prompt
 from disk_ops.device_service import DeviceService
 
 
+def package_partition(stdscr: window, device_service: DeviceService):
+    selected = 0
+    max_y, max_x = stdscr.getmaxyx()
+    height, width = 8, 30
+    win = newwin(height, width, max_y // 2 - height // 2, max_x // 2 - width // 2)
+    while True:
+        menu_items = [
+            f"Make Package Partition: {device_service.get_package_partition()}",
+            f"Package partition size: {device_service.get_package_partition_size()}",
+            f"Package partition file system: {device_service.get_package_partition_fs()}",
+        ]
+
+        print_menu(win, menu_items, selected)
+
+        key = stdscr.getch()
+        if check_quit_esc(key):
+            return 0
+        selected = change_selection(key, selected, menu_items)
+        if (key in (10, 13, KEY_ENTER) and selected == 0) or key == ord("1"):
+            selection_box(
+                stdscr=win,
+                message="Pick a file system for the package partition",
+                choices=[True, False],
+                callback=device_service.set_package_partition,
+                default_index=0,
+            )
+        if (key in (10, 13, KEY_ENTER) and selected == 1) or key == ord("2"):
+            pass
+        if (key in (10, 13, KEY_ENTER) and selected == 2) or key == ord("3"):
+            selection_box(
+                stdscr=win,
+                message="Pick a file system for the package partition",
+                choices=device_service.get_package_partition_types(),
+                callback=device_service.set_package_partition_fs,
+                default_index=0,
+            )
+            pass
+
+
 def partition_disk(stdscr: window, device_service: DeviceService, **kwargs):
     _ = kwargs
 
     boot_size = 100
+    package_partition_info = None
     selected = 0
     stdscr.clear()
     stdscr.refresh()
@@ -35,8 +75,10 @@ def partition_disk(stdscr: window, device_service: DeviceService, **kwargs):
         menu_items = [
             f"Boot partition size: {boot_size:4} MB",
             f"Boot partition file system: {device_service.get_boot_fs()}",
+            f"Set Package partition: {device_service.get_package_partition_info()}",
             f"Root partition size: rest of the disk",
             f"Root partition file system: {device_service.get_root_fs()}",
+            f"Make protective MBR on disk: {device_service.get_protective_mbr()}",
             "Partition disk",
         ]
         print_menu(stdscr=stdscr, menu_items=menu_items, selected=selected)
@@ -63,6 +105,8 @@ def partition_disk(stdscr: window, device_service: DeviceService, **kwargs):
                 callback=device_service.set_boot_fs,
                 default_index=0,
             )
+        elif (key in (10, KEY_ENTER) and selected == 2) or key == ord("3"):
+            package_partition(stdscr, device_service)
 
         elif (key in (10, KEY_ENTER) and selected == 3) or key == ord("4"):
 
