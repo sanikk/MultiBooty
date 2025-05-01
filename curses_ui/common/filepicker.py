@@ -31,7 +31,6 @@ def picker_windows(stdscr: window, height=None, width=None):
     left_pane = whole_window.derwin(max_y - 2, max_x // 2 - 1, 1 ,1)
     right_pane = whole_window.derwin(max_y - 2, max_x // 2 - 1, 1, max_x // 2 + 1)
 
-    # whole_window.vline(start_y, start_x, '|', window_height)
     selected_pane = 0
 
     left_list = listify_path()

@@ -41,7 +41,7 @@ def numeric_prompt(stdscr, offset, default):
 def selection_box(
     stdscr: window,
     message: str | list[str],
-    choices: list[str],
+    choices: list[str | bool],
     callback: Callable,
     default_index: int = 0,
 ):
