@@ -1,6 +1,4 @@
-from ast import arguments
 import re
-from subprocess import CalledProcessError
 from utils.runners import run_subprocess_with_sudo
 
 
@@ -8,13 +6,11 @@ def make_new_gpt(device):
     try:
         ret = run_subprocess_with_sudo(command="sgdisk", arguments=["-Z", "-o", device])
         if ret and ret.returncode == 0:
-            # print(ret.stdout)
             return True
         if ret:
             print(ret.stderr)
-    except CalledProcessError as e:
+    except Exception as e:
         print(e)
-        print(e.stderr)
     return False
 
 
@@ -28,7 +24,7 @@ def read_usable_sectors(device: str) -> tuple | None:
     return None
 
 
-def make_partition(device, partnum=0, start: int | str = 0, end: int | str = 0):
+def make_partition(device, partnum=0, start: int | str = 0, end: int | str = 0) -> bool:
     """
     Makes new GPT partition with sgdisk.
     Default values pick
@@ -44,7 +40,7 @@ def make_partition(device, partnum=0, start: int | str = 0, end: int | str = 0):
     return False
 
 
-def make_next_partition(device, size=None, esp: bool = False):
+def make_next_partition(device, esp: bool = False, size=None) -> bool:
     """
     Makes new GPT partition with sgdisk.
     Default values pick
@@ -57,50 +53,36 @@ def make_next_partition(device, size=None, esp: bool = False):
         arguments=[f"--new=0:0:{'+'+str(size)+"MB" if size else '0'}", device],
     )
     if ret and ret.returncode == 0:
-        # if esp:
-        #     ret = run_subprocess_with_sudo(
-        #         command="sgdisk", arguments=["--typecode=1:ef00", device]
-        #     )
-        # else:
-        #     ret = run_subprocess_with_sudo(
-        #         command="sgdisk", arguments=["--typecode=2:8300", device]
-        #     )
+        if esp:
+            ret = run_subprocess_with_sudo(
+                command="sgdisk", arguments=["--typecode=1:ef00", device]
+            )
+        else:
+            ret = run_subprocess_with_sudo(
+                command="sgdisk", arguments=["--typcode=2:8300", device]
+            )
         if ret and ret.returncode == 0:
             return True
     return False
 
 
 def make_protective_mbr(device, package_partition: bool):
-
-    ret = run_subprocess_with_sudo(
-        command="sgdisk", arguments=["--typecode=1:ef00", device]
-    )
-    if ret and ret.returncode == 0:
-        print("0 succesful")
-
+    """
+    Makes this into a hybrid mbr/gpt able to boot on both.
+    """
+    if package_partition:
         ret = run_subprocess_with_sudo(
-            command="sgdisk", arguments=["--typecode=2:8300", device]
+            command="sgdisk",
+            arguments=["--hybrid=1:2:3", "--attributes=1:set:2", device],
         )
         if ret and ret.returncode == 0:
-            print("1 succesful")
-            if package_partition:
-                ret = run_subprocess_with_sudo(
-                    command="sgdisk", arguments=["--typecode=3:8300", device]
-                )
-                if ret and ret.returncode == 0:
-                    print("made 3rd partition")
-                    ret = run_subprocess_with_sudo(
-                        command="sgdisk",
-                        arguments=["--hybrid=1:2:3", "--attributes=1:set:2", device],
-                    )
-                    if ret and ret.returncode == 0:
-                        return True
-            else:
-                ret = run_subprocess_with_sudo(
-                    command="sgdisk", arguments=["--hybrid=1:2", device]
-                )
-                if ret and ret.returncode == 0:
-                    return True
+            return True
+    else:
+        ret = run_subprocess_with_sudo(
+            command="sgdisk", arguments=["--hybrid=1:2", "--attributes=1:set:2", device]
+        )
+        if ret and ret.returncode == 0:
+            return True
     if ret:
         print(ret.stderr)
     return False

@@ -53,19 +53,12 @@ class DeviceService:
         self._mountpoint = "/mnt"
 
     def partition_disk(self):
-        # if self._boot_partition_fs and self._boot_partition_size:
-        #     print(0)
-        # else:
-        #     print("0 failed")
-        #     print(f"{self._boot_partition_fs=}")
-        #     print(f"{self._boot_partition_size=}")
-        #     return False
         if not make_new_gpt(self._device):
             return False
-        if not make_next_partition(self._device, self._boot_partition_size):
+        if not make_next_partition(self._device, size=self._boot_partition_size):
             return False
         if self._package_partition and not make_next_partition(
-            self._device, self._package_partition_size
+            self._device, size=self._package_partition_size
         ):
             return False
 
@@ -91,6 +84,9 @@ class DeviceService:
             self._device_info = self._all_devices[selection]
             self._device = self._device_info[0][0]
             self._all_devices = None
+
+    def get_device_info(self):
+        return self._device_info
 
     def get_mountpoint(self) -> str | None:
         return self._mountpoint
