@@ -1,7 +1,6 @@
-from curses import A_REVERSE, window
-from curses_ui.utils import format_size
+from curses import window
 from disk_ops.device_service import DeviceService
-from curses_ui.common.formatting import add_reverse
+from curses_ui.common.formatting import add_reverse, format_size
 
 
 def print_key_instructions(
@@ -28,9 +27,7 @@ def print_menu(
         item = f"{idx + 1}. {item}"
         x = w // 2 - len(item) // 2
         if idx == selected:
-            stdscr.attron(A_REVERSE)
-            stdscr.addstr(y, x, item)
-            stdscr.attroff(A_REVERSE)
+            add_reverse(stdscr, y, x, item)
         else:
             stdscr.addstr(y, x, item)
 

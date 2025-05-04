@@ -10,7 +10,7 @@ from disk_ops.filesystem.filesystem_runners import (
 from disk_ops.partitions.sgdisk_ops import (
     make_new_gpt,
     make_next_partition,
-    make_protective_mbr,
+    make_hybrid_mbr,
     verify_gpt,
 )
 
@@ -47,7 +47,7 @@ class DeviceService:
         self._root_fs = 0
         self._root_uuid = None
 
-        self._protective_mbr = True
+        self._hybrid_mbr = True
 
         self._mountpoint = "/mnt"
 
@@ -63,7 +63,7 @@ class DeviceService:
 
         if not make_next_partition(self._device):
             return False
-        if self._protective_mbr and not make_protective_mbr(
+        if self._hybrid_mbr and not make_hybrid_mbr(
             self._device, self._package_partition
         ):
             return False
@@ -129,7 +129,7 @@ class DeviceService:
     def get_package_partition(self) -> bool:
         return self._package_partition
 
-    def set_package_partition(self, val):
+    def set_package_partition(self, val: bool):
         if val in (True, False):
             self._package_partition = val
 
@@ -152,11 +152,11 @@ class DeviceService:
             return f"File system: {self._linux_fs_types[self._package_partition_fs][0]}, Size: {self._package_partition_size}"
         return f"{self._package_partition}"
 
-    def get_protective_mbr(self):
-        return self._protective_mbr
+    def get_hybrid_mbr(self):
+        return self._hybrid_mbr
 
-    def set_protective_mbr(self, val: bool):
-        self._protective_mbr = val
+    def set_hybrid_mbr(self, val: bool):
+        self._hybrid_mbr = val
 
     #     def device_info(self) -> None | tuple[tuple, list]:
     #         if not self._device:

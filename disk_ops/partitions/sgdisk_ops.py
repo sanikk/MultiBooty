@@ -66,7 +66,7 @@ def make_next_partition(device, esp: bool = False, size=None) -> bool:
     return False
 
 
-def make_protective_mbr(device, package_partition: bool):
+def make_hybrid_mbr(device, package_partition: bool):
     """
     Makes this into a hybrid mbr/gpt able to boot on both.
     """
