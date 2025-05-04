@@ -6,7 +6,7 @@ from curses_ui.common.prints import (
     print_menu,
     print_top,
 )
-from curses_ui.common.prompts import selection_box, text_prompt
+from curses_ui.common.prompts import selection_box, text_prompt, text_prompt_box
 from disk_ops.device_service import DeviceService
 
 
@@ -44,7 +44,14 @@ def package_partition(stdscr: window, device_service: DeviceService):
                 default_index=1,
             )
         if (key in (10, 13, KEY_ENTER) and selected == 1) or key == ord("2"):
-            pass
+            text_prompt_box(
+                stdscr=stdscr,
+                height=10,
+                width=30,
+                message=["Enter a size in MB for the", "package partition"],
+                getter=device_service.get_package_partition_size,
+                setter=device_service.set_package_partition_size,
+            )
         if (key in (10, 13, KEY_ENTER) and selected == 2) or key == ord("3"):
             selection_box(
                 stdscr=win,
@@ -53,13 +60,11 @@ def package_partition(stdscr: window, device_service: DeviceService):
                 callback=device_service.set_package_partition_fs,
                 default_index=0,
             )
-            pass
 
 
 def partition_disk(stdscr: window, device_service: DeviceService, **kwargs):
     _ = kwargs
 
-    boot_size = 100
     selected = 0
     stdscr.clear()
     stdscr.refresh()
@@ -79,7 +84,7 @@ def partition_disk(stdscr: window, device_service: DeviceService, **kwargs):
         print_disk_entry(stdscr=stdscr, disk_entry=device_info)
 
         menu_items = [
-            f"Boot partition size: {boot_size:4} MB",
+            f"Boot partition size: {device_service.get_boot_partition_size():4} MB",
             f"Boot partition file system: {device_service.get_boot_fs()}",
             f"Set Package partition: {device_service.get_package_partition_info()}",
             f"Root partition size: rest of the disk",
@@ -96,12 +101,22 @@ def partition_disk(stdscr: window, device_service: DeviceService, **kwargs):
             return 1
         selected = change_selection(key=key, selected=selected, menu_items=menu_items)
         if (key in (10, KEY_ENTER) and selected == 0) or key == ord("1"):
-            y, x = stdscr.getmaxyx()
-            y = y // 2 - len(menu_items) // 2
-            x = x // 2 + 10
-            ret = text_prompt(stdscr, y, x)
-            if ret and ret.isdigit():
-                boot_size = int(ret)
+            # y, x = stdscr.getmaxyx()
+            # y = y // 2 - len(menu_items) // 2
+            # x = x // 2 + 10
+            # ret = text_prompt(stdscr, y, x)
+            # if ret and ret.isdigit():
+            #     boot_size = int(ret)
+            height = 10
+            width = 30
+            text_prompt_box(
+                stdscr=stdscr,
+                height=height,
+                width=width,
+                message=["Enter a size in MB for", "the boot partition(FAT)"],
+                getter=device_service.get_boot_partition_size,
+                setter=device_service.set_boot_partition_size,
+            )
         elif (key in (10, KEY_ENTER) and selected == 1) or key == ord("2"):
 
             selection_box(

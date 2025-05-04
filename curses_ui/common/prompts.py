@@ -1,8 +1,9 @@
 from typing import Callable
-from curses import KEY_ENTER, window, echo, noecho, newwin
+from curses import KEY_ENTER, window, echo, noecho, newwin, KEY_BACKSPACE
 
 from curses_ui.common.controls import change_selection, check_quit_esc, close_window
 from curses_ui.common.prints import print_menu
+from curses_ui.common.windows import popup_window
 
 
 def text_prompt(win: window, line: int, col: int):
@@ -14,6 +15,46 @@ def text_prompt(win: window, line: int, col: int):
     noecho()
     if input_str:
         return input_str
+
+
+def text_prompt_box(
+    stdscr: window,
+    height: int,
+    width: int,
+    message: list[str],
+    getter: Callable,
+    setter: Callable,
+):
+    win = popup_window(stdscr=stdscr, height=height, width=width)
+    while True:
+        linenumber = 1
+        for linetext in message:
+            win.addstr(linenumber, 1, linetext)
+            linenumber += 1
+        linenumber += 1
+        win.addstr(linenumber, 1, f"Previous value: {getter()}")
+        linenumber += 2
+        win.refresh()
+
+        win.move(linenumber, 2)
+        input_str = ""
+        while True:
+            ch = win.getch()
+            if ch in (10, 13):
+                if setter(input_str):
+                    close_window(stdscr=stdscr, win=win)
+                    return
+            elif ch == 27:
+                return
+            elif ch in (8, 127, KEY_BACKSPACE):
+                if input_str:
+                    input_str = input_str[:-1]
+                    y, x = win.getyx()
+                    win.move(y, x - 1)
+                    win.delch()
+            elif 32 <= ch < 127:  # Printable ASCII
+                input_str += chr(ch)
+                win.addch(ch)
 
 
 def selection_box(

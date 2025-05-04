@@ -105,6 +105,18 @@ class DeviceService:
         return ret
 
     # Partition functions
+    def get_boot_partition_size(self):
+        return self._boot_partition_size
+
+    def set_boot_partition_size(self, val: str):
+        try:
+            new_size = int(val)
+            if 0 < new_size:
+                self._boot_partition_size = new_size
+                return True
+        except ValueError:
+            pass
+        return False
 
     def get_root_fs(self) -> str:
         return self._linux_fs_types[self._root_fs][0]
@@ -143,9 +155,15 @@ class DeviceService:
     def get_package_partition_size(self):
         return self._package_partition_size
 
-    def set_package_partition_size(self, size: int):
-        if size > 0:
-            self._package_partition_size = size
+    def set_package_partition_size(self, size_str: str):
+        try:
+            size = int(size_str)
+            if size > 0:
+                self._package_partition_size = size
+                return True
+        except ValueError:
+            pass
+        return False
 
     def get_package_partition_info(self):
         if self._package_partition:
