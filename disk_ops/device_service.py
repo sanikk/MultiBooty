@@ -11,7 +11,6 @@ from disk_ops.partitions.sgdisk_ops import (
     make_new_gpt,
     make_next_partition,
     make_protective_mbr,
-    print_partitions,
     verify_gpt,
 )
 
@@ -110,7 +109,7 @@ class DeviceService:
     def get_root_fs(self) -> str:
         return self._linux_fs_types[self._root_fs][0]
 
-    def get_linux_fs_types(self):
+    def get_linux_fs_types(self) -> list:
         return [a[0] for a in self._linux_fs_types]
 
     def set_root_fs(self, index: int):
@@ -118,24 +117,24 @@ class DeviceService:
             self._root_fs = index
 
     def get_boot_fs(self) -> str:
-        return self._fat_fs_types[self._boot_fs][0]
+        return self._fat_fs_types[self._boot_partition_fs][0]
 
-    def get_fat_fs_types(self):
+    def get_fat_fs_types(self) -> list:
         return [a[0] for a in self._fat_fs_types]
 
     def set_boot_fs(self, index: int):
         if 0 <= index < len(self._fat_fs_types):
             self._boot_fs = index
 
-    def get_package_partition(self):
+    def get_package_partition(self) -> bool:
         return self._package_partition
 
     def set_package_partition(self, val):
         if val in (True, False):
             self._package_partition = val
 
-    def get_package_partition_fs(self):
-        return self._package_partition_fs
+    def get_package_partition_fs(self) -> str:
+        return self._linux_fs_types[self._package_partition_fs][0]
 
     def set_package_partition_fs(self, index: int):
         if 0 <= index < len(self._linux_fs_types):
@@ -150,7 +149,7 @@ class DeviceService:
 
     def get_package_partition_info(self):
         if self._package_partition:
-            return f"File system: {self._linux_fs_types[self._package_partition_fs]}, Size: {self._package_partition_size}"
+            return f"File system: {self._linux_fs_types[self._package_partition_fs][0]}, Size: {self._package_partition_size}"
         return f"{self._package_partition}"
 
     def get_protective_mbr(self):
