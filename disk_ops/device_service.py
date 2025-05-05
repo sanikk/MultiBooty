@@ -87,6 +87,15 @@ class DeviceService:
     def get_device_info(self):
         return self._device_info
 
+    def read_device_info(self) -> bool:
+        if not self._device:
+            return False
+        ret = disk_info(self._device)
+        if ret:
+            self._device_info = ret
+            return True
+        return False
+
     def get_mountpoint(self) -> str | None:
         return self._mountpoint
 

@@ -1,12 +1,13 @@
 from curses import KEY_ENTER, newwin, window
-from curses_ui.common.controls import change_selection, check_quit_esc, close_window
+from curses_ui.common.controls import change_selection, check_quit_esc
+from curses_ui.common.windows import close_window
 from curses_ui.common.prints import (
     print_disk_entry,
     print_key_instructions,
     print_menu,
     print_top,
 )
-from curses_ui.common.prompts import selection_box, text_prompt, text_prompt_box
+from curses_ui.common.prompts import selection_box, text_prompt_box
 from disk_ops.device_service import DeviceService
 
 
