@@ -1,10 +1,9 @@
 from pathlib import Path
-from curses import doupdate, window, newwin, A_REVERSE
-# ,KEY_BACKSPACE, KEY_ENTER
+from curses import doupdate, window, newwin
 
 from curses_ui.common.controls import change_selection, check_quit_esc
+from curses_ui.common.formatting import add_reverse
 from curses_ui.common.prints import print_key_instructions
-# from curses_ui.common.formatting import add_reverse
 
 
 def filereader(filepath: str, mask: str) -> list:
@@ -12,29 +11,25 @@ def filereader(filepath: str, mask: str) -> list:
     return list(files)
 
 
-def close_window(stdscr: window, box_win: window):
-    del box_win
-    stdscr.touchwin()
-    stdscr.refresh()
-
-
-
 def fileviewerwindow(stdscr: window, height: int = 22, width: int = 40):
     max_width = stdscr.getmaxyx()[1]
     box_win = newwin(height, width, 1, max_width // 2 - width // 2)
     return box_win
 
-suggested_locations = [
-    Path.cwd(),
-    Path.home(),
-    Path.home() / "Downloads"
-]
-def listify_path(path: Path|None=None, mask="*"):
-    if not path:
-        return [(idx, path) for idx,path in enumerate(suggested_locations)]
-    return [(idx,entry) for idx,entry in enumerate([entry for entry in path.glob("*") if entry.is_dir() or entry.match(mask)])]
 
-    
+suggested_locations = [Path.cwd(), Path.home(), Path.home() / "Downloads"]
+
+
+def listify_path(path: Path | None = None, mask="*"):
+    if not path:
+        return [(idx, path) for idx, path in enumerate(suggested_locations)]
+    return [
+        (idx, entry)
+        for idx, entry in enumerate(
+            [entry for entry in path.glob("*") if entry.is_dir() or entry.match(mask)]
+        )
+    ]
+
 
 def fileviewer(stdscr: window, path: str, mask: str):
     beginning = 0
@@ -54,9 +49,7 @@ def fileviewer(stdscr: window, path: str, mask: str):
         for idx, file_entry in files[beginning : beginning + showing]:
 
             if idx == selected:
-                box_win.attron(A_REVERSE)
-                box_win.addstr(linenumber, 2, f"{str(file_entry)[:max_width]}")
-                box_win.attroff(A_REVERSE)
+                add_reverse(box_win, linenumber, 2, f"{str(file_entry)[:max_width]}")
             else:
                 box_win.addstr(linenumber, 2, f"{str(file_entry)[:max_width]}")
             linenumber += 1
@@ -70,4 +63,3 @@ def fileviewer(stdscr: window, path: str, mask: str):
         beginning = max(0, min(selected - 10, len(files) - showing))
         box_win.noutrefresh()
         doupdate()
-
